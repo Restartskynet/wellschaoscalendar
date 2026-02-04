@@ -46,7 +46,7 @@ Where:
 
 ### 🔐 Authentication & Roles
 - **Admin Accounts** (Ben & Marie): Full calendar control, create/edit/delete events, assign parks
-- **User Accounts** (Rachel, Chris, Sam, Jacob, Erika, Benny): RSVP to events, add comments, react with stickers
+- **User Accounts** (Rachel, Chris, Sam, Jacob, Erika, Benny): RSVP to events, add comments
 - Quick test login for easy development
 - Account switcher for testing different user perspectives
 - Custom profile pictures with circular crop
@@ -58,7 +58,7 @@ Where:
 - **Excitement Meter**: Family members rate their excitement (1-5 ⭐)
 - **Park Schedule**: View all trip days, admins can assign parks
 - **Trip Details**: Hotel info, duration, custom notes
-- **Weather Widget**: Orlando weather with helpful reminders
+- **Weather Widget (placeholder)**: Orlando weather copy until live data is wired up
 
 ### 📅 Calendar Page
 - **Day-by-Day Timeline**: Navigate through trip days
@@ -82,22 +82,17 @@ Where:
   - "Going!" or "Can't Make It" options
   - Add fun 50-character quips
   - See who's attending with avatars
-- **Sticker Reactions**: React to events with 🎉 ❤️ 😂 🔥 ⭐ 👍 🎢 🍕
 - **Event Chat**: Mini chat for each event block
 - **Admin & User Parity**: Admins can RSVP and interact just like regular users
 
 ### 🎨 Personalization
-- **10+ Gorgeous Themes**:
+- **6 Gorgeous Themes**:
   - 🏰 Magic Kingdom (pink/purple)
   - 🌍 EPCOT (blue/cyan)
   - 🎬 Hollywood Studios (yellow/orange)
   - 🌳 Animal Kingdom (green/emerald)
   - ⚡ Universal (indigo/purple)
   - 💜 Classic Purple
-  - 🌊 Ocean Breeze
-  - 🌅 Sunset Vibes
-  - 🌲 Forest Green
-  - 🍭 Cotton Candy
 - **Enhanced Theme Selector**: Clear visual indication with ring, scale, and checkmark
 - **Custom Avatars**: Upload and crop circular profile pictures
 - **Personal Theme Settings**: Each family member picks their favorite
@@ -126,7 +121,7 @@ Animations are **decoration** and **communication**:
 * Soft transitions between days (swipe/slide)
 * Blocks "snap" into place with slideIn animation
 * Gentle "pulse" for upcoming events
-* Pop-in animations for RSVPs and reactions
+* Pop-in animations for RSVPs
 * Bounce animation for countdown timer
 * Delightful empty states (clouds instead of "no events")
 
@@ -178,7 +173,6 @@ This project dies if it becomes ugly, confusing, or corporate.
 * park
 * notes
 * rsvps (array of { username, status, quip })
-* reactions (object of { sticker: [usernames] })
 * chats (array of { username, message, timestamp })
 
 ### User Account
@@ -222,7 +216,6 @@ This project dies if it becomes ugly, confusing, or corporate.
 - [x] Family & personal time blocks
 - [x] RSVP system with quips
 - [x] Location details with park-specific directions
-- [x] Sticker reactions
 - [x] Event chat
 - [x] Park schedule
 - [x] Excitement meter
@@ -286,7 +279,6 @@ This project dies if it becomes ugly, confusing, or corporate.
 1. Login as admin, create events
 2. Switch accounts (Users icon) to test as regular user
 3. RSVP to events, add fun quips
-4. React with stickers
 5. Chat on events
 6. Rate your excitement level
 

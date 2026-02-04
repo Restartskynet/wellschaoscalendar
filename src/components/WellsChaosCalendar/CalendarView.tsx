@@ -31,12 +31,19 @@ const CalendarView = ({ trip, currentUser, accounts, theme, onShowAccountSwitche
   const currentDay = trip.days[currentDayIndex];
   const nextDay = () => setCurrentDayIndex(Math.min(currentDayIndex + 1, trip.days.length - 1));
   const prevDay = () => setCurrentDayIndex(Math.max(currentDayIndex - 1, 0));
+  const sortedBlocks = [...currentDay.blocks].sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+  const updateTripDays = (updatedDay: Trip['days'][number]) => {
+    const updatedDays = trip.days.map((day, index) => (index === currentDayIndex ? updatedDay : day));
+    onUpdateTrip({ ...trip, days: updatedDays });
+  };
 
   const getNextEvent = () => {
     const now = new Date();
     for (let i = currentDayIndex; i < trip.days.length; i += 1) {
       const day = trip.days[i];
-      for (const block of day.blocks) {
+      const sortedDayBlocks = [...day.blocks].sort((a, b) => a.startTime.localeCompare(b.startTime));
+      for (const block of sortedDayBlocks) {
         const blockTime = new Date(day.date);
         const [hours, minutes] = block.startTime.split(':');
         blockTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
@@ -106,7 +113,7 @@ const CalendarView = ({ trip, currentUser, accounts, theme, onShowAccountSwitche
           <Cloud size={32} className="text-blue-500" />
           <div className="flex-1">
             <div className="font-semibold text-blue-800">Orlando Weather</div>
-            <div className="text-sm text-blue-600">Sunny, 82°F • Pack sunscreen!</div>
+            <div className="text-sm text-blue-600">{trip.weather ?? 'Weather coming soon.'}</div>
           </div>
         </div>
       </div>
@@ -149,20 +156,18 @@ const CalendarView = ({ trip, currentUser, accounts, theme, onShowAccountSwitche
                 <div className="text-sm">No plans yet - pure freedom!</div>
               </div>
             ) : (
-              currentDay.blocks
-                .sort((a, b) => a.startTime.localeCompare(b.startTime))
-                .map((block, index) => (
-                    <TimeBlock
-                      key={`${block.title}-${index}`}
-                      block={block}
-                      onEdit={isAdmin ? () => setEditingBlock(block) : undefined}
-                      onRsvp={() => setShowRsvpModal(block)}
-                      onChat={() => setShowEventChat(block)}
-                      currentUser={currentUser}
-                      accounts={accounts}
-                      isAdmin={isAdmin}
-                    />
-                ))
+              sortedBlocks.map((block, index) => (
+                <TimeBlock
+                  key={`${block.title}-${index}`}
+                  block={block}
+                  onEdit={isAdmin ? () => setEditingBlock(block) : undefined}
+                  onRsvp={() => setShowRsvpModal(block)}
+                  onChat={() => setShowEventChat(block)}
+                  currentUser={currentUser}
+                  accounts={accounts}
+                  isAdmin={isAdmin}
+                />
+              ))
             )}
           </div>
 
@@ -185,17 +190,20 @@ const CalendarView = ({ trip, currentUser, accounts, theme, onShowAccountSwitche
           onSave={(block) => {
             if (editingBlock) {
               const blockIndex = currentDay.blocks.findIndex((b) => b === editingBlock);
-              currentDay.blocks[blockIndex] = block;
+              const updatedBlocks = currentDay.blocks.map((existingBlock, index) =>
+                index === blockIndex ? block : existingBlock
+              );
+              updateTripDays({ ...currentDay, blocks: updatedBlocks });
             } else {
-              currentDay.blocks.push(block);
+              const updatedBlocks = [...currentDay.blocks, block];
+              updateTripDays({ ...currentDay, blocks: updatedBlocks });
             }
-            onUpdateTrip({ ...trip });
             setEditingBlock(null);
             setShowBlockForm(false);
           }}
           onDelete={() => {
-            currentDay.blocks = currentDay.blocks.filter((b) => b !== editingBlock);
-            onUpdateTrip({ ...trip });
+            const updatedBlocks = currentDay.blocks.filter((b) => b !== editingBlock);
+            updateTripDays({ ...currentDay, blocks: updatedBlocks });
             setEditingBlock(null);
           }}
           onCancel={() => {
@@ -211,14 +219,18 @@ const CalendarView = ({ trip, currentUser, accounts, theme, onShowAccountSwitche
           currentUser={currentUser}
           theme={theme}
           onSave={(rsvp) => {
-            if (!showRsvpModal.rsvps) showRsvpModal.rsvps = [];
-            const existingIndex = showRsvpModal.rsvps.findIndex((r) => r.username === currentUser.username);
+            const existingRsvps = showRsvpModal.rsvps ?? [];
+            const existingIndex = existingRsvps.findIndex((r) => r.username === currentUser.username);
+            const updatedRsvps = [...existingRsvps];
             if (existingIndex >= 0) {
-              showRsvpModal.rsvps[existingIndex] = rsvp;
+              updatedRsvps[existingIndex] = rsvp;
             } else {
-              showRsvpModal.rsvps.push(rsvp);
+              updatedRsvps.push(rsvp);
             }
-            onUpdateTrip({ ...trip });
+            const updatedBlocks = currentDay.blocks.map((block) =>
+              block === showRsvpModal ? { ...block, rsvps: updatedRsvps } : block
+            );
+            updateTripDays({ ...currentDay, blocks: updatedBlocks });
             setShowRsvpModal(null);
           }}
           onCancel={() => setShowRsvpModal(null)}
@@ -232,9 +244,11 @@ const CalendarView = ({ trip, currentUser, accounts, theme, onShowAccountSwitche
           accounts={accounts}
           theme={theme}
           onSave={(chat) => {
-            if (!showEventChat.chats) showEventChat.chats = [];
-            showEventChat.chats.push(chat);
-            onUpdateTrip({ ...trip });
+            const updatedChats = [...(showEventChat.chats ?? []), chat];
+            const updatedBlocks = currentDay.blocks.map((block) =>
+              block === showEventChat ? { ...block, chats: updatedChats } : block
+            );
+            updateTripDays({ ...currentDay, blocks: updatedBlocks });
           }}
           onClose={() => setShowEventChat(null)}
         />

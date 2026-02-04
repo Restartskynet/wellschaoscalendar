@@ -13,17 +13,24 @@ const CreateTripForm = ({ accounts, theme, onBack, onCreate }: CreateTripFormPro
   const [tripName, setTripName] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [dateError, setDateError] = useState('');
 
   const handleCreate = () => {
     if (!tripName || !startDate || !endDate) return;
 
     const start = new Date(startDate);
     const end = new Date(endDate);
+    if (end < start) {
+      setDateError('End date must be on or after the start date.');
+      return;
+    }
+    setDateError('');
     const days = [];
 
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       days.push({
         date: new Date(d),
+        park: null,
         blocks: []
       });
     }
@@ -32,6 +39,8 @@ const CreateTripForm = ({ accounts, theme, onBack, onCreate }: CreateTripFormPro
       name: tripName,
       members: accounts,
       days,
+      hotel: null,
+      notes: '',
       weather: null
     });
   };
@@ -78,6 +87,11 @@ const CreateTripForm = ({ accounts, theme, onBack, onCreate }: CreateTripFormPro
                 />
               </div>
             </div>
+            {dateError && (
+              <div className="bg-red-50 border-2 border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
+                {dateError}
+              </div>
+            )}
 
             <div className="bg-purple-50 rounded-xl p-4">
               <div className="text-sm font-semibold text-purple-800 mb-3">Family Members</div>

@@ -1,6 +1,10 @@
-import type { Account, Theme, ThemeKey } from '../types/wellsChaos';
+export type Theme = {
+  primary: string;
+  bg: string;
+  accent: string;
+};
 
-export const THEMES: Record<ThemeKey, Theme> = {
+export const THEMES = {
   'Magic Kingdom': {
     primary: 'from-pink-500 to-purple-500',
     bg: 'from-pink-50 via-purple-50 to-pink-50',
@@ -31,89 +35,6 @@ export const THEMES: Record<ThemeKey, Theme> = {
     bg: 'from-purple-50 via-pink-50 to-orange-50',
     accent: 'purple'
   }
-};
+} as const satisfies Record<string, Theme>;
 
-export const STICKERS = ['🎉', '❤️', '😂', '🔥', '⭐', '👍', '🎢', '🍕'];
-
-export const PRESET_ACCOUNTS: Account[] = [
-  {
-    username: 'ben',
-    password: 'magic2024',
-    name: 'Ben',
-    role: 'admin',
-    defaultAvatar: '👨',
-    color: 'blue',
-    customAvatar: null,
-    theme: 'Default'
-  },
-  {
-    username: 'marie',
-    password: 'disney123',
-    name: 'Marie',
-    role: 'admin',
-    defaultAvatar: '👩',
-    color: 'pink',
-    customAvatar: null,
-    theme: 'Default'
-  },
-  {
-    username: 'rachel',
-    password: 'rides4eva',
-    name: 'Rachel',
-    role: 'user',
-    defaultAvatar: '👧',
-    color: 'purple',
-    customAvatar: null,
-    theme: 'Default'
-  },
-  {
-    username: 'chris',
-    password: 'universal1',
-    name: 'Chris',
-    role: 'user',
-    defaultAvatar: '👦',
-    color: 'green',
-    customAvatar: null,
-    theme: 'Default'
-  },
-  {
-    username: 'sam',
-    password: 'vacation!',
-    name: 'Sam',
-    role: 'user',
-    defaultAvatar: '🧒',
-    color: 'yellow',
-    customAvatar: null,
-    theme: 'Default'
-  },
-  {
-    username: 'jacob',
-    password: 'funtime99',
-    name: 'Jacob',
-    role: 'user',
-    defaultAvatar: '👶',
-    color: 'orange',
-    customAvatar: null,
-    theme: 'Default'
-  },
-  {
-    username: 'erika',
-    password: 'princess2',
-    name: 'Erika',
-    role: 'user',
-    defaultAvatar: '👧',
-    color: 'pink',
-    customAvatar: null,
-    theme: 'Default'
-  },
-  {
-    username: 'benny',
-    password: 'explorer7',
-    name: 'Benny',
-    role: 'user',
-    defaultAvatar: '🧑',
-    color: 'teal',
-    customAvatar: null,
-    theme: 'Default'
-  }
-];
+export type ThemeKey = keyof typeof THEMES;

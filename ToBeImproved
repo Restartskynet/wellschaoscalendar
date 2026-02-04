@@ -1,0 +1,52 @@
+# To Be Improved
+
+## 1) Persistence (local storage or backend)
+**Goal:** Keep trips, RSVPs, chats, and avatars from disappearing on refresh.
+
+**Approach Options**
+- **Phase 1: Local storage**
+  - Serialize `Trip`, `Account`, and user settings to `localStorage`.
+  - Load on app start and merge with preset defaults.
+  - Add basic versioning to migrate saved data if the schema changes.
+- **Phase 2: Backend**
+  - Introduce an API (e.g., Next.js API routes).
+  - Store data in a database (PostgreSQL, SQLite, or Firestore).
+  - Add optimistic UI updates and syncing.
+
+**Milestones**
+1. Implement `localStorage` read/write hooks.
+2. Create a migration strategy for schema changes.
+3. Introduce API + database for shared access across devices.
+
+---
+
+## 2) Authentication & Password Handling
+**Goal:** Avoid hard-coded credentials if the app is hosted or shared.
+
+**Approach Options**
+- **Phase 1: Environment-based config**
+  - Move preset credentials into environment variables or a local config file.
+  - Add a simple “family code” gate for shared access.
+- **Phase 2: Proper auth**
+  - Use NextAuth (planned in roadmap) or another auth provider.
+  - Store hashed passwords, not plaintext.
+
+**Milestones**
+1. Move preset logins into config and hide them from the UI.
+2. Add password hashing + secure auth flow.
+3. Implement role-based access with server-side checks.
+
+---
+
+## 3) Align Data Model to Roadmap
+**Goal:** Ensure types and UI match the README roadmap fields (park, hotel, notes, etc.).
+
+**Approach**
+- Add missing fields to types (`Trip.hotel`, `Trip.notes`, `TripDay.park`).
+- Introduce UI inputs for these fields in trip creation and editing.
+- Update calendar view to surface the new data consistently.
+
+**Milestones**
+1. Update TypeScript types and default values.
+2. Add UI inputs for hotel + notes.
+3. Add per-day park assignments and display in the calendar.
