@@ -57,4 +57,19 @@ export type Trip = {
   weather: string | null;
 };
 
+export type PackingItem = {
+  id: string;
+  item: string;
+  packed: boolean;
+  addedBy: string;
+};
+
+export type BudgetItem = {
+  id: string;
+  description: string;
+  amount: number;
+  paidBy: string;
+  splitWith: string[];
+};
+
 export type EventTheme = Theme;

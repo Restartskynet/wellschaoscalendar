@@ -1,24 +1,52 @@
 import { useState } from 'react';
 import { PRESET_ACCOUNTS } from '../../data/accounts';
 import { THEMES } from '../../data/themes';
-import type { Account, EventTheme, Trip } from '../../types/wellsChaos';
+import type { Account, BudgetItem, ChatMessage, EventTheme, PackingItem, Trip } from '../../types/wellsChaos';
 import AccountSwitcher from './AccountSwitcher';
 import AnimationStyles from './AnimationStyles';
+import BottomNav, { type PageType } from './BottomNav';
 import CalendarView from './CalendarView';
+import ChatPage from './ChatPage';
 import CreateTripForm from './CreateTripForm';
+import HomePage from './HomePage';
 import LoginScreen from './LoginScreen';
+import MorePage from './MorePage';
+import PhotosPage from './PhotosPage';
 import ProfileEditor from './ProfileEditor';
 import WelcomeScreen from './WelcomeScreen';
 
-type ViewState = 'login' | 'welcome' | 'createTrip' | 'calendar';
+type ViewState = 'login' | 'welcome' | 'createTrip' | 'app';
+
+// Default packing list items
+const DEFAULT_PACKING_LIST: PackingItem[] = [
+  { id: '1', item: '🧴 Sunscreen SPF 50+', packed: false, addedBy: 'ben' },
+  { id: '2', item: '👟 Comfortable walking shoes', packed: false, addedBy: 'ben' },
+  { id: '3', item: '🎒 Day backpack', packed: false, addedBy: 'ben' },
+  { id: '4', item: '🔋 Portable phone charger', packed: false, addedBy: 'marie' },
+  { id: '5', item: '💧 Refillable water bottles', packed: false, addedBy: 'marie' },
+  { id: '6', item: '🧢 Hats for sun protection', packed: false, addedBy: 'ben' },
+  { id: '7', item: '🌂 Ponchos (Florida rain!)', packed: false, addedBy: 'marie' },
+  { id: '8', item: '📱 MagicBand / Park tickets', packed: false, addedBy: 'ben' },
+  { id: '9', item: '💊 First aid kit / medications', packed: false, addedBy: 'marie' },
+  { id: '10', item: '🍫 Snacks for park', packed: false, addedBy: 'ben' }
+];
+
+// Default budget items
+const DEFAULT_BUDGET_ITEMS: BudgetItem[] = [];
 
 const WellsChaosCalendar = () => {
   const [currentView, setCurrentView] = useState<ViewState>('login');
+  const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [currentUser, setCurrentUser] = useState<Account | null>(null);
   const [accounts, setAccounts] = useState<Account[]>(PRESET_ACCOUNTS);
   const [trip, setTrip] = useState<Trip | null>(null);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
+
+  // New state for pages
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [packingList, setPackingList] = useState<PackingItem[]>(DEFAULT_PACKING_LIST);
+  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(DEFAULT_BUDGET_ITEMS);
 
   const getCurrentTheme = (): EventTheme => {
     if (!currentUser) return THEMES.Default;
@@ -34,6 +62,71 @@ const WellsChaosCalendar = () => {
     setCurrentUser(null);
     setCurrentView('login');
     setTrip(null);
+    setCurrentPage('home');
+  };
+
+  const handleSendChatMessage = (message: ChatMessage) => {
+    setChatMessages((prev) => [...prev, message]);
+  };
+
+  // Render the current page based on currentPage state
+  const renderCurrentPage = () => {
+    if (!currentUser || !trip) return null;
+
+    const theme = getCurrentTheme();
+
+    switch (currentPage) {
+      case 'home':
+        return (
+          <HomePage
+            trip={trip}
+            currentUser={currentUser}
+            theme={theme}
+            onShowAccountSwitcher={() => setShowAccountSwitcher(true)}
+            onShowSettings={() => setShowProfileEdit(true)}
+            onUpdateTrip={setTrip}
+          />
+        );
+      case 'calendar':
+        return (
+          <CalendarView
+            trip={trip}
+            currentUser={currentUser}
+            accounts={accounts}
+            theme={theme}
+            onShowAccountSwitcher={() => setShowAccountSwitcher(true)}
+            onUpdateTrip={setTrip}
+          />
+        );
+      case 'photos':
+        return <PhotosPage trip={trip} theme={theme} />;
+      case 'chat':
+        return (
+          <ChatPage
+            trip={trip}
+            currentUser={currentUser}
+            accounts={accounts}
+            theme={theme}
+            chatMessages={chatMessages}
+            onSendMessage={handleSendChatMessage}
+          />
+        );
+      case 'more':
+        return (
+          <MorePage
+            trip={trip}
+            currentUser={currentUser}
+            accounts={accounts}
+            theme={theme}
+            packingList={packingList}
+            budgetItems={budgetItems}
+            onUpdatePackingList={setPackingList}
+            onUpdateBudgetItems={setBudgetItems}
+          />
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -60,20 +153,21 @@ const WellsChaosCalendar = () => {
           onBack={() => setCurrentView('welcome')}
           onCreate={(newTrip) => {
             setTrip(newTrip);
-            setCurrentView('calendar');
+            setCurrentView('app');
+            setCurrentPage('home');
           }}
         />
       )}
 
-      {currentView === 'calendar' && currentUser && trip && (
-        <CalendarView
-          trip={trip}
-          currentUser={currentUser}
-          accounts={accounts}
-          theme={getCurrentTheme()}
-          onShowAccountSwitcher={() => setShowAccountSwitcher(true)}
-          onUpdateTrip={setTrip}
-        />
+      {currentView === 'app' && currentUser && trip && (
+        <>
+          {renderCurrentPage()}
+          <BottomNav
+            currentPage={currentPage}
+            onNavigate={setCurrentPage}
+            theme={getCurrentTheme()}
+          />
+        </>
       )}
 
       {showProfileEdit && currentUser && (

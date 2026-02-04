@@ -49,6 +49,22 @@ const AnimationStyles = () => (
             transform: scale(1);
           }
         }
+        @keyframes bounce-slow {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-8px);
+          }
+        }
+        @keyframes shimmer {
+          0% {
+            background-position: -200% 0;
+          }
+          100% {
+            background-position: 200% 0;
+          }
+        }
         .animate-slide-up {
           animation: slide-up 0.3s ease-out;
         }
@@ -61,8 +77,37 @@ const AnimationStyles = () => (
         .animate-pop-in {
           animation: pop-in 0.3s ease-out;
         }
+        .animate-bounce-slow {
+          animation: bounce-slow 2s ease-in-out infinite;
+        }
+        .animate-shimmer {
+          animation: shimmer 2s linear infinite;
+          background-size: 200% 100%;
+        }
         .hover\\:scale-102:hover {
           transform: scale(1.02);
+        }
+        /* Safe area utilities for iOS */
+        .pb-safe {
+          padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        .h-safe {
+          height: env(safe-area-inset-bottom, 0px);
+        }
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: rgba(156, 163, 175, 0.5);
+          border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: rgba(156, 163, 175, 0.7);
         }
       `}</style>
 );
