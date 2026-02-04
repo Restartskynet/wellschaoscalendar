@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { PRESET_ACCOUNTS, THEMES } from '../../data/themes';
+import { PRESET_ACCOUNTS } from '../../data/accounts';
+import { THEMES } from '../../data/themes';
 import type { Account, EventTheme, Trip } from '../../types/wellsChaos';
 import AccountSwitcher from './AccountSwitcher';
 import AnimationStyles from './AnimationStyles';

@@ -1,5 +1,5 @@
 import { X, Zap } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ATTRACTIONS, COMMON_ACTIVITIES, LOCATION_DETAILS, RESTAURANTS, SHOWS_PARADES, THEME_PARKS } from '../../data/parks';
 import type { EventTheme, TimeBlock } from '../../types/wellsChaos';
 
@@ -12,23 +12,26 @@ type BlockFormModalProps = {
 };
 
 const BlockFormModal = ({ block, theme, onSave, onDelete, onCancel }: BlockFormModalProps) => {
-  const [formData, setFormData] = useState<TimeBlock>(
-    block || {
-      type: 'FAMILY',
-      title: '',
-      startTime: '09:00',
-      endTime: '10:00',
-      location: '',
-      park: '',
-      notes: '',
-      rsvps: [],
-      reactions: {},
-      chats: []
-    }
-  );
+  const getDefaultBlock = (): TimeBlock => ({
+    type: 'FAMILY',
+    title: '',
+    startTime: '09:00',
+    endTime: '10:00',
+    location: '',
+    park: '',
+    notes: '',
+    rsvps: [],
+    chats: []
+  });
+
+  const [formData, setFormData] = useState<TimeBlock>(block ?? getDefaultBlock());
 
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestionType, setSuggestionType] = useState('');
+
+  useEffect(() => {
+    setFormData(block ?? getDefaultBlock());
+  }, [block]);
 
   const getSuggestions = () => {
     const { park } = formData;

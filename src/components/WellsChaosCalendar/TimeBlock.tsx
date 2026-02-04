@@ -1,6 +1,5 @@
 import { Check, Clock, Edit2, Heart, MapPin, MessageCircle, ThumbsDown } from 'lucide-react';
 import { LOCATION_DETAILS } from '../../data/parks';
-import { STICKERS } from '../../data/themes';
 import type { Account, TimeBlock as TimeBlockType } from '../../types/wellsChaos';
 
 type TimeBlockProps = {
@@ -17,20 +16,7 @@ const TimeBlock = ({ block, onEdit, onRsvp, onChat, currentUser, accounts, isAdm
   const isFamily = block.type === 'FAMILY';
   const rsvps = block.rsvps || [];
   const userRsvp = rsvps.find((r) => r.username === currentUser.username);
-  const reactions = block.reactions || {};
   const chats = block.chats || [];
-
-  const toggleReaction = (sticker: string) => {
-    if (!block.reactions) block.reactions = {};
-    if (!block.reactions[sticker]) block.reactions[sticker] = [];
-
-    const index = block.reactions[sticker].indexOf(currentUser.username);
-    if (index >= 0) {
-      block.reactions[sticker].splice(index, 1);
-    } else {
-      block.reactions[sticker].push(currentUser.username);
-    }
-  };
 
   const locationDetail = block.park && block.title && LOCATION_DETAILS[block.park]?.[block.title];
 
@@ -65,35 +51,6 @@ const TimeBlock = ({ block, onEdit, onRsvp, onChat, currentUser, accounts, isAdm
           )}
           {locationDetail && <div className="text-xs text-gray-500 italic mt-1 ml-5">{locationDetail}</div>}
           {block.park && <div className="text-xs text-gray-500 mt-1">📍 {block.park}</div>}
-
-          {Object.keys(reactions).some((s) => reactions[s].length > 0) && (
-            <div className="flex flex-wrap gap-2 mt-3">
-              {Object.keys(reactions)
-                .filter((s) => reactions[s].length > 0)
-                .map((sticker) => (
-                  <div key={sticker} className="bg-white rounded-full px-2 py-1 text-xs flex items-center gap-1 shadow-sm">
-                    <span>{sticker}</span>
-                    <span className="font-semibold text-gray-600">{reactions[sticker].length}</span>
-                  </div>
-                ))}
-            </div>
-          )}
-
-          <div className="flex flex-wrap gap-1 mt-3">
-            {STICKERS.slice(0, 4).map((sticker) => (
-              <button
-                key={sticker}
-                onClick={() => toggleReaction(sticker)}
-                className={`text-lg p-1 rounded-lg transition-all ${
-                  reactions[sticker]?.includes(currentUser.username)
-                    ? 'bg-yellow-100 scale-110'
-                    : 'hover:bg-gray-100'
-                }`}
-              >
-                {sticker}
-              </button>
-            ))}
-          </div>
 
           {isFamily && rsvps.length > 0 && (
             <div className="mt-3 pt-3 border-t border-orange-200">

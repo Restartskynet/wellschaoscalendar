@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { Camera, Crown, Upload, X } from 'lucide-react';
 import { THEMES } from '../../data/themes';
+import type { ThemeKey } from '../../data/themes';
 import type { Account } from '../../types/wellsChaos';
 
 type ProfileEditorProps = {
@@ -84,7 +85,7 @@ const ProfileEditor = ({
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Choose Your Theme</label>
             <div className="grid grid-cols-2 gap-2">
-              {Object.keys(THEMES).map((themeName) => (
+              {(Object.keys(THEMES) as ThemeKey[]).map((themeName) => (
                 <button
                   key={themeName}
                   onClick={() => {

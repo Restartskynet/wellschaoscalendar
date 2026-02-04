@@ -1,16 +1,4 @@
-export type ThemeKey =
-  | 'Magic Kingdom'
-  | 'EPCOT'
-  | 'Hollywood Studios'
-  | 'Animal Kingdom'
-  | 'Universal'
-  | 'Default';
-
-export type Theme = {
-  primary: string;
-  bg: string;
-  accent: string;
-};
+import type { Theme, ThemeKey } from '../data/themes';
 
 export type AccountRole = 'admin' | 'user';
 
@@ -48,12 +36,12 @@ export type TimeBlock = {
   park: string;
   notes: string;
   rsvps: RSVP[];
-  reactions: Record<string, string[]>;
   chats: ChatMessage[];
 };
 
 export type TripDay = {
   date: Date;
+  park: string | null;
   blocks: TimeBlock[];
 };
 
@@ -61,6 +49,11 @@ export type Trip = {
   name: string;
   members: Account[];
   days: TripDay[];
+  hotel: {
+    name: string;
+    address: string;
+  } | null;
+  notes: string;
   weather: string | null;
 };
 
