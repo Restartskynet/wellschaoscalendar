@@ -23,6 +23,19 @@ const CalendarView = ({ trip, currentUser, accounts, theme, onShowAccountSwitche
   const [showEventChat, setShowEventChat] = useState<TimeBlockType | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  // Helper to get park emoji
+  const getParkEmoji = (park: string | null) => {
+    if (!park) return '☁️';
+    if (park.includes('Magic Kingdom')) return '🏰';
+    if (park.includes('EPCOT')) return '🌍';
+    if (park.includes('Hollywood')) return '🎬';
+    if (park.includes('Animal')) return '🦁';
+    if (park.includes('Universal')) return '🎢';
+    if (park.includes('Islands')) return '🧙';
+    if (park.includes('Volcano')) return '🌋';
+    return '🎡';
+  };
+
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(timer);
@@ -59,7 +72,7 @@ const CalendarView = ({ trip, currentUser, accounts, theme, onShowAccountSwitche
   const isAdmin = currentUser.role === 'admin';
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${theme.bg} pb-20`}>
+    <div className={`min-h-screen bg-gradient-to-br ${theme.bg} pb-24`}>
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-2">
@@ -138,6 +151,18 @@ const CalendarView = ({ trip, currentUser, accounts, theme, onShowAccountSwitche
                   day: 'numeric'
                 })}
               </div>
+              {currentDay.park && (
+                <div className={`mt-1 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${theme.primary} text-white`}>
+                  <span>{getParkEmoji(currentDay.park)}</span>
+                  <span>{currentDay.park}</span>
+                </div>
+              )}
+              {!currentDay.park && (
+                <div className="mt-1 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                  <span>☁️</span>
+                  <span>Free Day</span>
+                </div>
+              )}
             </div>
 
             <button
