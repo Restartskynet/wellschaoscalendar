@@ -5,26 +5,51 @@ import type { Account } from '../../types/wellsChaos';
 type LoginScreenProps = {
   accounts: Account[];
   onLogin: (account: Account) => void;
+  onSupabaseLogin?: (username: string, password: string) => Promise<{ error: string | null }>;
+  isSupabaseMode?: boolean;
 };
 
-const LoginScreen = ({ accounts, onLogin }: LoginScreenProps) => {
+const LoginScreen = ({ accounts, onLogin, onSupabaseLogin, isSupabaseMode }: LoginScreenProps) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [cooldown, setCooldown] = useState(false);
 
-  const handleLogin = () => {
-    const user = accounts.find((acc) => acc.username === username && acc.password === password);
-    if (user) {
-      onLogin(user);
+  const handleLogin = async () => {
+    // Case-sensitive, no trimming, no normalization
+    if (!username || !password) return;
+
+    if (isSupabaseMode && onSupabaseLogin) {
+      setIsLoading(true);
       setError('');
+
+      const result = await onSupabaseLogin(username, password);
+
+      if (result.error) {
+        setError(result.error);
+        // Brief cooldown on failure
+        setCooldown(true);
+        setTimeout(() => setCooldown(false), 2000);
+      }
+      setIsLoading(false);
     } else {
-      setError('Invalid username or password');
+      // Dev mode: match against preset accounts (case-sensitive, no trim)
+      const user = accounts.find((acc) => acc.username === username && acc.password === password);
+      if (user) {
+        onLogin(user);
+        setError('');
+      } else {
+        setError('Invalid username or password');
+      }
     }
   };
 
   const quickLogin = (account: Account) => {
     onLogin(account);
   };
+
+  const isDev = import.meta.env.DEV;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center p-4">
@@ -44,11 +69,14 @@ const LoginScreen = ({ accounts, onLogin }: LoginScreenProps) => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              onKeyPress={(e) => {
+              onKeyDown={(e) => {
                 if (e.key === 'Enter') handleLogin();
               }}
               placeholder="Enter username"
               className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none transition-colors"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
             />
           </div>
 
@@ -58,7 +86,7 @@ const LoginScreen = ({ accounts, onLogin }: LoginScreenProps) => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              onKeyPress={(e) => {
+              onKeyDown={(e) => {
                 if (e.key === 'Enter') handleLogin();
               }}
               placeholder="Enter password"
@@ -74,37 +102,45 @@ const LoginScreen = ({ accounts, onLogin }: LoginScreenProps) => {
 
           <button
             onClick={handleLogin}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+            disabled={isLoading || cooldown}
+            className={`w-full py-4 rounded-xl font-semibold text-lg shadow-lg transition-all duration-200 ${
+              isLoading || cooldown
+                ? 'bg-gray-300 text-gray-500'
+                : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-xl transform hover:scale-105'
+            }`}
           >
-            Sign In
+            {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <p className="text-xs text-purple-600 font-semibold text-center mb-3">🚀 Quick Test Login:</p>
-          <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
-            {accounts.map((acc) => (
-              <button
-                key={acc.username}
-                onClick={() => quickLogin(acc)}
-                className="bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 p-3 rounded-xl transition-all transform hover:scale-105 border-2 border-purple-200"
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-lg border-2 border-purple-200">
-                    {acc.customAvatar ? (
-                      <img src={acc.customAvatar} alt={acc.name} className="w-full h-full rounded-full object-cover" />
-                    ) : (
-                      acc.defaultAvatar
-                    )}
+        {/* Quick login picker - DEV ONLY */}
+        {isDev && (
+          <div className="mt-8 pt-6 border-t border-gray-200">
+            <p className="text-xs text-purple-600 font-semibold text-center mb-3">🚀 Quick Test Login:</p>
+            <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+              {accounts.map((acc) => (
+                <button
+                  key={acc.username}
+                  onClick={() => quickLogin(acc)}
+                  className="bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 p-3 rounded-xl transition-all transform hover:scale-105 border-2 border-purple-200"
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-lg border-2 border-purple-200">
+                      {acc.customAvatar ? (
+                        <img src={acc.customAvatar} alt={acc.name} className="w-full h-full rounded-full object-cover" />
+                      ) : (
+                        acc.defaultAvatar
+                      )}
+                    </div>
+                    {acc.role === 'admin' && <Crown size={12} className="text-yellow-500" />}
                   </div>
-                  {acc.role === 'admin' && <Crown size={12} className="text-yellow-500" />}
-                </div>
-                <div className="text-xs font-semibold text-gray-800">{acc.name}</div>
-                <div className="text-xs text-gray-500">{acc.role}</div>
-              </button>
-            ))}
+                  <div className="text-xs font-semibold text-gray-800">{acc.name}</div>
+                  <div className="text-xs text-gray-500">{acc.role}</div>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -172,3 +172,40 @@ supabase secrets set FAMILY_ACCESS_CODE=your-secret-code
 **Build**: PASS | **Tests**: PASS
 
 ---
+
+## SLICE 5 - Swap Prototype Auth to Supabase Auth
+
+**Status**: COMPLETE
+
+**Changes**:
+
+1. **`LoginScreen.tsx`**: Updated to support dual-mode auth:
+   - New props: `onSupabaseLogin`, `isSupabaseMode`
+   - When Supabase configured: calls edge function via `onSupabaseLogin`
+   - When not configured: uses existing preset account matching
+   - Case-sensitive username (no trim, no normalize) — `autoCapitalize="off"`
+   - Quick-login picker now dev-only (`import.meta.env.DEV`)
+   - Brief cooldown after failed login attempts
+   - `onKeyPress` replaced with `onKeyDown` (non-deprecated)
+
+2. **`WellsChaosCalendar.tsx`**: Integrated gate + Supabase auth:
+   - New `'gate'` view state
+   - Shows FamilyGateScreen before login when Supabase configured + no device token
+   - `handleSupabaseLogin()` calls `auth.signIn()` with device ID/token
+   - AccountSwitcher now dev-only
+   - Logout calls `auth.signOut()` in Supabase mode
+
+3. **`App.test.tsx`**: Added 4 new tests (5 total):
+   - Login fields render
+   - Invalid login shows error
+   - Case-sensitive username validation
+   - Gate screen skipped when Supabase not configured
+
+**Key behavior**:
+- Without env vars (dev): everything works exactly as before
+- With env vars (prod): gate -> login -> edge function -> session
+- Login UI visually identical in both modes
+
+**Build**: PASS | **Tests**: 5/5 PASS
+
+---
