@@ -1,0 +1,68 @@
+{
+  "slug": "food-preferences",
+  "title": "Food & Dining Preferences",
+  "description": "Let's make sure everyone eats well! Share your food preferences so we can pick great restaurants.",
+  "emoji": "🍕",
+  "questions": [
+    {
+      "id": "dining-style",
+      "type": "single-choice",
+      "question": "What's your preferred dining style at the parks?",
+      "knowledgeCard": {
+        "title": "Dining at Disney & Universal",
+        "content": "Quick Service means order at a counter — fast, cheaper ($12-18). Table Service means sit-down with a server — nicer food, pricier ($25-50), and requires reservations (book 60 days out for Disney!). Character dining combines a meal with character visits ($40-70) and books up fast."
+      },
+      "options": [
+        { "value": "quick", "label": "Quick service mostly — keep it fast and cheap", "emoji": "🍔" },
+        { "value": "mix", "label": "Mix of quick and sit-down", "emoji": "🍽️" },
+        { "value": "sitdown", "label": "Prefer sit-down meals for real breaks", "emoji": "🍷" },
+        { "value": "character", "label": "Character dining is a must!", "emoji": "👸" }
+      ]
+    },
+    {
+      "id": "dietary",
+      "type": "multi-choice",
+      "question": "Any dietary needs or preferences?",
+      "knowledgeCard": {
+        "title": "Dietary Options at the Parks",
+        "content": "Disney is exceptional with dietary accommodations — inform your server of any allergies. Most restaurants can handle gluten-free, vegan, and allergy-friendly meals. Use the My Disney Experience app to filter by dietary need. Universal is also improving but Disney leads here."
+      },
+      "options": [
+        { "value": "none", "label": "No restrictions — I eat everything!", "emoji": "😋" },
+        { "value": "vegetarian", "label": "Vegetarian", "emoji": "🥬" },
+        { "value": "vegan", "label": "Vegan", "emoji": "🌱" },
+        { "value": "gluten-free", "label": "Gluten-free", "emoji": "🌾" },
+        { "value": "dairy-free", "label": "Dairy-free", "emoji": "🥛" },
+        { "value": "nut-allergy", "label": "Nut allergy", "emoji": "🥜" },
+        { "value": "picky", "label": "Picky eater — keep it simple", "emoji": "🤷" }
+      ]
+    },
+    {
+      "id": "snack-budget",
+      "type": "budget-allocation",
+      "question": "If you had 100 points to spend on food categories, how would you split them?",
+      "knowledgeCard": {
+        "title": "Must-Try Park Snacks",
+        "content": "Disney's famous snacks: Dole Whip (pineapple soft serve), turkey legs, churros, Mickey pretzels, and the grey stuff (it's delicious!). Universal has Butterbeer (frozen or regular), and Epic Universe will have amazing new food. Snacks can easily add $30-50/day per person."
+      },
+      "categories": [
+        { "id": "meals", "label": "Sit-down meals", "emoji": "🍝" },
+        { "id": "snacks", "label": "Park snacks & treats", "emoji": "🍦" },
+        { "id": "drinks", "label": "Special drinks & beverages", "emoji": "🧃" },
+        { "id": "save", "label": "Save money (eat at hotel)", "emoji": "💰" }
+      ],
+      "total": 100
+    },
+    {
+      "id": "reservation",
+      "type": "single-choice",
+      "question": "How do you feel about dinner reservations with the whole family?",
+      "options": [
+        { "value": "love", "label": "Love it! Book us a nice dinner each night", "emoji": "🥂" },
+        { "value": "sometimes", "label": "Maybe 1-2 nice dinners during the trip", "emoji": "🍽️" },
+        { "value": "skip", "label": "Skip it — I'd rather eat quick and keep exploring", "emoji": "🚀" },
+        { "value": "flexible", "label": "Whatever the group wants!", "emoji": "🤝" }
+      ]
+    }
+  ]
+}

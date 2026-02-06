@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Cloud, Plus, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import BlockFormModal from './BlockFormModal';
 import EventChatModal from './EventChatModal';
@@ -122,16 +122,6 @@ const CalendarView = ({ trip, currentUser, accounts, theme, onShowAccountSwitche
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-4">
-        <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 flex items-center gap-3">
-          <Cloud size={32} className="text-blue-500" />
-          <div className="flex-1">
-            <div className="font-semibold text-blue-800">Orlando Weather</div>
-            <div className="text-sm text-blue-600">{trip.weather ?? 'Weather coming soon.'}</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-2xl mx-auto px-4 py-2">
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <button

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { PRESET_ACCOUNTS } from '../../data/accounts';
 import { THEMES } from '../../data/themes';
+import { useAuth } from '../../providers/AuthProvider';
+import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import type { Account, BudgetItem, ChatMessage, EventTheme, PackingItem, Trip } from '../../types/wellsChaos';
 import AccountSwitcher from './AccountSwitcher';
 import AnimationStyles from './AnimationStyles';
@@ -8,6 +10,8 @@ import BottomNav, { type PageType } from './BottomNav';
 import CalendarView from './CalendarView';
 import ChatPage from './ChatPage';
 import CreateTripForm from './CreateTripForm';
+import DesktopLayout from './DesktopLayout';
+import FamilyGateScreen, { getDeviceId, getDeviceToken, hasPassedGate } from './FamilyGateScreen';
 import HomePage from './HomePage';
 import LoginScreen from './LoginScreen';
 import MorePage from './MorePage';
@@ -15,7 +19,7 @@ import PhotosPage from './PhotosPage';
 import ProfileEditor from './ProfileEditor';
 import WelcomeScreen from './WelcomeScreen';
 
-type ViewState = 'login' | 'welcome' | 'createTrip' | 'app';
+type ViewState = 'gate' | 'login' | 'welcome' | 'createTrip' | 'app';
 
 // Default packing list items
 const DEFAULT_PACKING_LIST: PackingItem[] = [
@@ -35,7 +39,16 @@ const DEFAULT_PACKING_LIST: PackingItem[] = [
 const DEFAULT_BUDGET_ITEMS: BudgetItem[] = [];
 
 const WellsChaosCalendar = () => {
-  const [currentView, setCurrentView] = useState<ViewState>('login');
+  const supabaseMode = isSupabaseConfigured();
+  const auth = useAuth();
+
+  // Determine initial view: if Supabase is configured and gate not passed, show gate
+  const getInitialView = (): ViewState => {
+    if (supabaseMode && !hasPassedGate()) return 'gate';
+    return 'login';
+  };
+
+  const [currentView, setCurrentView] = useState<ViewState>(getInitialView);
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [currentUser, setCurrentUser] = useState<Account | null>(null);
   const [accounts, setAccounts] = useState<Account[]>(PRESET_ACCOUNTS);
@@ -58,7 +71,36 @@ const WellsChaosCalendar = () => {
     setCurrentView('welcome');
   };
 
-  const handleLogout = () => {
+  const handleSupabaseLogin = async (username: string, password: string): Promise<{ error: string | null }> => {
+    const deviceId = getDeviceId();
+    const deviceToken = getDeviceToken() || '';
+    const result = await auth.signIn(username, password, deviceId, deviceToken);
+
+    if (!result.error) {
+      // After signIn, profile may take a moment to load.
+      // For now, set a minimal account from the username to proceed.
+      // The profile will be hydrated when AuthProvider fetches it.
+      const account: Account = {
+        username,
+        password: '',
+        name: username,
+        role: 'user',
+        defaultAvatar: '🧑',
+        color: 'purple',
+        customAvatar: null,
+        theme: 'Default',
+      };
+      setCurrentUser(account);
+      setCurrentView('welcome');
+    }
+
+    return result;
+  };
+
+  const handleLogout = async () => {
+    if (supabaseMode) {
+      await auth.signOut();
+    }
     setCurrentUser(null);
     setCurrentView('login');
     setTrip(null);
@@ -129,11 +171,24 @@ const WellsChaosCalendar = () => {
     }
   };
 
+  const isDev = import.meta.env.DEV;
+
   return (
     <div className="font-sans">
       <AnimationStyles />
 
-      {currentView === 'login' && <LoginScreen accounts={accounts} onLogin={handleLogin} />}
+      {currentView === 'gate' && (
+        <FamilyGateScreen onGatePassed={() => setCurrentView('login')} />
+      )}
+
+      {currentView === 'login' && (
+        <LoginScreen
+          accounts={accounts}
+          onLogin={handleLogin}
+          onSupabaseLogin={supabaseMode ? handleSupabaseLogin : undefined}
+          isSupabaseMode={supabaseMode}
+        />
+      )}
 
       {currentView === 'welcome' && currentUser && (
         <WelcomeScreen
@@ -161,12 +216,25 @@ const WellsChaosCalendar = () => {
 
       {currentView === 'app' && currentUser && trip && (
         <>
-          {renderCurrentPage()}
-          <BottomNav
+          {/* Mobile: bottom nav */}
+          <div className="lg:hidden">
+            {renderCurrentPage()}
+            <BottomNav
+              currentPage={currentPage}
+              onNavigate={setCurrentPage}
+              theme={getCurrentTheme()}
+            />
+          </div>
+
+          {/* Desktop: sidebar layout */}
+          <DesktopLayout
             currentPage={currentPage}
             onNavigate={setCurrentPage}
             theme={getCurrentTheme()}
-          />
+            tripName={trip.name}
+          >
+            {renderCurrentPage()}
+          </DesktopLayout>
         </>
       )}
 
@@ -180,7 +248,8 @@ const WellsChaosCalendar = () => {
         />
       )}
 
-      {showAccountSwitcher && currentUser && (
+      {/* Account switcher - DEV ONLY */}
+      {isDev && showAccountSwitcher && currentUser && (
         <AccountSwitcher
           accounts={accounts}
           currentUser={currentUser}

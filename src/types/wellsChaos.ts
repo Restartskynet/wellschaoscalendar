@@ -54,7 +54,6 @@ export type Trip = {
     address: string;
   } | null;
   notes: string;
-  weather: string | null;
 };
 
 export type PackingItem = {
