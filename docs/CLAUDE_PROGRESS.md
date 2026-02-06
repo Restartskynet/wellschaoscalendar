@@ -105,3 +105,28 @@ Append-only log of implementation slices. Each slice records what changed, why, 
 **Build**: PASS | **Tests**: PASS
 
 ---
+
+## SLICE 3 - Core Schema SQL Migrations + RLS Policies
+
+**Status**: COMPLETE
+
+**Files created** in `supabase/migrations/`:
+
+1. `001_profiles.sql` - Profiles (1:1 with auth.users), RLS: read all, update own
+2. `002_trips.sql` - Trips + trip_members, RLS: members read, admins write
+3. `003_days_blocks.sql` - Trip days + time blocks, helper functions `is_trip_member()` / `is_trip_admin()`, RLS: members read, admins write blocks
+4. `004_rsvps_messages.sql` - RSVPs + messages (trip chat + event chat), RLS: members read, own RSVP write, append-only messages
+5. `005_budget.sql` - Budget expenses, RLS: members read + add, admins/creators edit/delete
+6. `006_packing.sql` - Base items (admin-managed) + per-user checks + personal items, RLS: admin manages base, users manage own checks/personal
+7. `007_questionnaires.sql` - Questionnaires + responses (jsonb answers), RLS: members see their own responses, admins see all
+8. `008_security.sql` - Device gates, auth attempts, username lockouts, allowed usernames allowlist, indexes for rate limit queries
+
+**Key design decisions**:
+- Packing: base items shared (admin writes), packed state per-user via `packing_checks`, personal items per-user only
+- Messages table handles both trip chat and event chat (via trip_id / block_id)
+- Security tables have no authenticated policies (managed by edge functions with service_role)
+- Budget: all members can add expenses
+
+**Build**: PASS | **Tests**: PASS
+
+---
