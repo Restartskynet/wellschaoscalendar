@@ -105,6 +105,22 @@ Where:
 
 ---
 
+## Distribution Plan (PWA first → App Store / Play Store later)
+
+### PWA (now)
+Right now this project ships as a **PWA** (a web app that can be “installed” from the browser). It’s perfect for fast iteration and family-only usage.
+
+### App Store / Play Store (later milestone)
+A store app is a **packaged native app** distributed through Apple/Google stores. You can still reuse this exact Vite/React code by **wrapping it** (common approach), but it introduces:
+- store builds and store review
+- versioning + release process
+- easier access to certain native behaviors/permissions
+
+**Clean path:** Build as a PWA first (fast iteration), then when it’s launch-ready, wrap with something like **Capacitor** and publish to iOS/Android stores — without rewriting the whole app.
+
+
+---
+
 ## Design Philosophy
 
 ### ✦ Visual Identity
