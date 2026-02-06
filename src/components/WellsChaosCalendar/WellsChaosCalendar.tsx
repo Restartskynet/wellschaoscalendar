@@ -10,6 +10,7 @@ import BottomNav, { type PageType } from './BottomNav';
 import CalendarView from './CalendarView';
 import ChatPage from './ChatPage';
 import CreateTripForm from './CreateTripForm';
+import DesktopLayout from './DesktopLayout';
 import FamilyGateScreen, { getDeviceId, getDeviceToken, hasPassedGate } from './FamilyGateScreen';
 import HomePage from './HomePage';
 import LoginScreen from './LoginScreen';
@@ -215,12 +216,25 @@ const WellsChaosCalendar = () => {
 
       {currentView === 'app' && currentUser && trip && (
         <>
-          {renderCurrentPage()}
-          <BottomNav
+          {/* Mobile: bottom nav */}
+          <div className="lg:hidden">
+            {renderCurrentPage()}
+            <BottomNav
+              currentPage={currentPage}
+              onNavigate={setCurrentPage}
+              theme={getCurrentTheme()}
+            />
+          </div>
+
+          {/* Desktop: sidebar layout */}
+          <DesktopLayout
             currentPage={currentPage}
             onNavigate={setCurrentPage}
             theme={getCurrentTheme()}
-          />
+            tripName={trip.name}
+          >
+            {renderCurrentPage()}
+          </DesktopLayout>
         </>
       )}
 

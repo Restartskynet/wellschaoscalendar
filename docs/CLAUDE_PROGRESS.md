@@ -242,3 +242,29 @@ supabase secrets set FAMILY_ACCESS_CODE=your-secret-code
 **Build**: PASS | **Tests**: 5/5 PASS
 
 ---
+
+## SLICE 7 - Desktop Shell Pass
+
+**Status**: COMPLETE
+
+**Files created**:
+- `src/components/WellsChaosCalendar/DesktopLayout.tsx`: Desktop sidebar layout
+
+**Changes**:
+- `WellsChaosCalendar.tsx`: Added DesktopLayout wrapper for `lg:` breakpoint
+
+**Design**:
+- Mobile (`< lg`): Bottom nav preserved exactly as before
+- Desktop (`>= lg`): Fixed left sidebar (w-64) with nav items + centered main content (max-w-4xl)
+- Sidebar shows trip name, nav items styled like the bottom nav but vertical
+- Uses Tailwind `hidden lg:flex` / `lg:hidden` for responsive toggle (no JS media queries)
+- iOS safe area handling preserved (only active on mobile)
+
+**How to QA**:
+- On mobile viewport: bottom nav visible, no sidebar
+- On desktop viewport (>= 1024px): sidebar visible, no bottom nav
+- Navigation works in both layouts
+
+**Build**: PASS | **Tests**: 5/5 PASS
+
+---
