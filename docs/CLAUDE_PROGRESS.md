@@ -209,3 +209,36 @@ supabase secrets set FAMILY_ACCESS_CODE=your-secret-code
 **Build**: PASS | **Tests**: 5/5 PASS
 
 ---
+
+## SLICE 6 - Realtime Sync + IndexedDB Local Cache
+
+**Status**: COMPLETE
+
+**Dependencies added**: `idb` (lightweight IndexedDB wrapper)
+
+**Files created**:
+
+1. **`src/lib/localCache.ts`**: IndexedDB cache layer
+   - DB: `wcc-cache` with stores for trip, days, blocks, rsvps, messages, budget, packing, meta
+   - Generic helpers: `cacheGet`, `cacheSet`, `cacheGetAll`, `cacheBulkPut`, `cacheClear`
+   - Trip-specific: `cacheTripData()` (bulk save), `getCachedTripData()` (load cached state)
+   - Tracks last sync timestamp per trip
+   - All operations are best-effort (silent fail if IndexedDB unavailable)
+
+2. **`src/lib/realtimeSync.ts`**: Supabase Realtime subscription layer
+   - `subscribeToTrip(tripId, onChange)`: subscribes to postgres_changes on all sync tables
+   - Tables: time_blocks, rsvps, messages, budget_expenses, packing_base_items, packing_checks, trip_days
+   - Returns cleanup function for unmount
+   - Graceful no-op when Supabase not configured
+
+**Architecture**: On login, the app will:
+1. Load cached state from IndexedDB (instant open)
+2. Hydrate from Supabase (fresh data)
+3. Subscribe to realtime changes
+4. Apply updates to UI state + cache
+
+**How to QA**: No visible changes yet — these are plumbing modules. Integration happens when Supabase is connected.
+
+**Build**: PASS | **Tests**: 5/5 PASS
+
+---
