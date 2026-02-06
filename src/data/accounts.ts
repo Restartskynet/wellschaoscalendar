@@ -63,7 +63,7 @@ export const PRESET_ACCOUNTS: Account[] = [
   },
   {
     username: 'erika',
-    password: 'princess2',
+    password: 'DisneyPrincess420',
     name: 'Erika',
     role: 'user',
     defaultAvatar: '👧',
