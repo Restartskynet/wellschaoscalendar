@@ -206,7 +206,7 @@ const MorePage = ({
               }`}
             >
               <ClipboardList size={18} />
-              Surveys
+              Questionnaires
             </button>
           </div>
         </div>
