@@ -363,22 +363,13 @@ const MorePage = ({
             <div className="bg-white rounded-2xl shadow-lg p-4">
               <div className="flex items-center justify-between mb-4">
                 <span className="font-semibold text-gray-800">Expenses</span>
-                {isAdmin && (
-                  <button
-                    onClick={() => setShowBudgetForm(true)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium bg-gradient-to-r ${theme.primary} text-white hover:shadow-md transition-all`}
-                  >
-                    <Plus size={16} className="inline mr-1" />
-                    Add
-                  </button>
-                )}
               </div>
 
               {budgetItems.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-3">💰</div>
                   <p className="text-gray-500 text-sm">No expenses recorded yet</p>
-                  {isAdmin && <p className="text-gray-400 text-xs mt-1">Track shared costs with your group</p>}
+                  <p className="text-gray-400 text-xs mt-1">Track shared costs with your group</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -435,6 +426,17 @@ const MorePage = ({
           </div>
         )}
       </div>
+
+      {/* Budget FAB - always visible on budget tab, positioned above bottom nav */}
+      {activeTab === 'budget' && !showBudgetForm && (
+        <button
+          onClick={() => setShowBudgetForm(true)}
+          data-testid="budget-fab"
+          className={`fixed bottom-24 right-4 z-40 w-14 h-14 rounded-full bg-gradient-to-r ${theme.primary} text-white shadow-lg hover:shadow-xl flex items-center justify-center transform hover:scale-110 active:scale-95 transition-all duration-200`}
+        >
+          <Plus size={24} />
+        </button>
+      )}
 
       {/* Budget Form Modal */}
       {showBudgetForm && (

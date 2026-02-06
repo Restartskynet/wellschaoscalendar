@@ -1,4 +1,4 @@
-import { Building2, Calendar, Clock, Cloud, MapPin, Settings, Sparkles, Sun, Users } from 'lucide-react';
+import { Building2, Calendar, Clock, MapPin, Settings, Sparkles, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { THEME_PARKS } from '../../data/parks';
 import type { Account, EventTheme, Trip } from '../../types/wellsChaos';
@@ -268,30 +268,6 @@ const HomePage = ({
             )}
           </div>
         )}
-
-        {/* Weather Widget */}
-        <div className="bg-gradient-to-br from-blue-400 to-cyan-400 rounded-2xl shadow-lg p-4 text-white animate-fade-in">
-          <div className="flex items-center gap-3">
-            <div className="w-16 h-16 rounded-2xl bg-white bg-opacity-20 flex items-center justify-center">
-              <Sun size={32} className="text-yellow-200" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <Cloud size={16} />
-                <span className="text-sm font-medium opacity-90">Orlando Weather</span>
-              </div>
-              <div className="text-xl font-bold mt-1">
-                {trip.weather || 'Sunny, 82°F • Perfect park day!'}
-              </div>
-            </div>
-          </div>
-          <div className="mt-3 pt-3 border-t border-white border-opacity-20">
-            <div className="text-sm opacity-90 flex items-center gap-2">
-              <span className="text-lg">💡</span>
-              Pack sunscreen & stay hydrated!
-            </div>
-          </div>
-        </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-3 animate-fade-in">

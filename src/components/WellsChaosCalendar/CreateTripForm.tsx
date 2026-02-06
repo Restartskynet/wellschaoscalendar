@@ -40,8 +40,7 @@ const CreateTripForm = ({ accounts, theme, onBack, onCreate }: CreateTripFormPro
       members: accounts,
       days,
       hotel: null,
-      notes: '',
-      weather: null
+      notes: ''
     });
   };
 
