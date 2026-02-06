@@ -130,3 +130,45 @@ Append-only log of implementation slices. Each slice records what changed, why, 
 **Build**: PASS | **Tests**: PASS
 
 ---
+
+## SLICE 4 - Edge Functions: Family Gate + Rate Limit + Login
+
+**Status**: COMPLETE
+
+**Files created**:
+
+1. **`supabase/functions/family_gate/index.ts`**: Family access code verification
+   - POST `{ familyCode, deviceId }`
+   - Validates code against `FAMILY_ACCESS_CODE` secret
+   - Creates/upserts device_gates row
+   - Returns `{ deviceToken }` for local storage
+
+2. **`supabase/functions/family_login/index.ts`**: Server-enforced login
+   - POST `{ username, password, deviceId, deviceToken }`
+   - Validates device token (gate must be passed first)
+   - Checks username allowlist
+   - Rate limiting: 5 attempts/username -> 20min lock, 30/IP per 10min
+   - Performs Supabase Auth `signInWithPassword` using `username@wellschaos.family`
+   - Returns session tokens on success
+
+3. **`supabase/functions/keepalive/index.ts`**: Health check endpoint
+   - Light DB touch for uptime monitoring
+
+4. **`src/components/WellsChaosCalendar/FamilyGateScreen.tsx`**: Gate UI
+   - Shows before login on new devices
+   - Stores device token in localStorage after success
+   - Helpers: `getDeviceId()`, `getDeviceToken()`, `hasPassedGate()`
+
+**Security documented limitation**: Anon key is visible in client JS. A determined attacker could bypass edge functions and call Supabase Auth directly. Strong passwords + RLS remain critical.
+
+**How to deploy**:
+```bash
+supabase functions deploy family_gate
+supabase functions deploy family_login
+supabase functions deploy keepalive
+supabase secrets set FAMILY_ACCESS_CODE=your-secret-code
+```
+
+**Build**: PASS | **Tests**: PASS
+
+---
