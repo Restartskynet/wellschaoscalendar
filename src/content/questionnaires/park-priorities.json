@@ -1,0 +1,86 @@
+{
+  "slug": "park-priorities",
+  "title": "Park Day Priorities",
+  "description": "Help Ben & Marie plan the perfect park days by sharing what matters most to you!",
+  "emoji": "🎢",
+  "questions": [
+    {
+      "id": "ride-thrill",
+      "type": "single-choice",
+      "question": "What's your thrill level for rides?",
+      "knowledgeCard": {
+        "title": "Ride Intensity at the Parks",
+        "content": "Disney and Universal have rides for every comfort level. From gentle boat rides like It's a Small World to intense coasters like Velocicoaster and Space Mountain, there's something for everyone. Don't worry about keeping up — we'll plan groups so everyone has fun!"
+      },
+      "options": [
+        { "value": "chill", "label": "Keep it chill — gentle rides and shows", "emoji": "🌊" },
+        { "value": "moderate", "label": "A mix of thrills and calm", "emoji": "🎠" },
+        { "value": "thrill", "label": "Bring on the big coasters!", "emoji": "🎢" },
+        { "value": "extreme", "label": "I want to ride EVERYTHING", "emoji": "🚀" }
+      ]
+    },
+    {
+      "id": "park-pace",
+      "type": "single-choice",
+      "question": "How do you like to pace your park day?",
+      "knowledgeCard": {
+        "title": "Park Day Pacing",
+        "content": "A typical Disney/Universal day can be 10-14 hours of walking in Florida heat. The parks are huge! Magic Kingdom alone has over 25 attractions. Some families power through with a strict schedule; others take it slow with pool breaks. Both are valid — the key is knowing everyone's style."
+      },
+      "options": [
+        { "value": "relaxed", "label": "Slow and easy — breaks, pool time, naps", "emoji": "😴" },
+        { "value": "moderate", "label": "Steady pace with lunch breaks", "emoji": "🚶" },
+        { "value": "active", "label": "Go-go-go! Maximize every minute", "emoji": "🏃" },
+        { "value": "flexible", "label": "Flexible — I'll go with the flow", "emoji": "🌊" }
+      ]
+    },
+    {
+      "id": "must-do",
+      "type": "multi-choice",
+      "question": "Which experiences are MUST-DOs for you? (Pick all that apply)",
+      "knowledgeCard": {
+        "title": "Top Experiences",
+        "content": "These are the headline attractions across the parks. Lightning Lane (paid skip-the-line) may be available for some. Character meets often have 30-60 min waits but are magical for kids. Fireworks are free and spectacular — just find a good spot 30 min early!"
+      },
+      "options": [
+        { "value": "characters", "label": "Character meet & greets", "emoji": "🏰" },
+        { "value": "fireworks", "label": "Fireworks / nighttime shows", "emoji": "🎆" },
+        { "value": "headliners", "label": "Headliner rides (Tron, Hagrid's, etc.)", "emoji": "⚡" },
+        { "value": "food", "label": "Amazing food & snacks", "emoji": "🍕" },
+        { "value": "shopping", "label": "Shopping for souvenirs", "emoji": "🛍️" },
+        { "value": "shows", "label": "Live shows & parades", "emoji": "🎭" },
+        { "value": "photos", "label": "PhotoPass / Memory Maker photos", "emoji": "📸" },
+        { "value": "water", "label": "Water rides / water park", "emoji": "💦" }
+      ]
+    },
+    {
+      "id": "budget-comfort",
+      "type": "slider",
+      "question": "How much are you comfortable spending per day (food, souvenirs, extras)?",
+      "knowledgeCard": {
+        "title": "Daily Spending at the Parks",
+        "content": "Quick service meals run $12-18 per person. Table service is $25-50+. Snacks (turkey legs, Dole Whip, churros) are $6-12. Souvenirs range widely — a t-shirt is $25-40, a lightsaber build is $250. Water is free at counter service restaurants (ask for ice water)!"
+      },
+      "min": 25,
+      "max": 200,
+      "step": 25,
+      "unit": "$",
+      "labels": { "min": "$25", "max": "$200+" }
+    },
+    {
+      "id": "group-split",
+      "type": "single-choice",
+      "question": "Are you okay splitting up from the group sometimes?",
+      "knowledgeCard": {
+        "title": "Splitting Up Strategy",
+        "content": "Families often split into groups based on thrill tolerance. Rider Swap lets parents trade off on rides while someone stays with young kids — no re-waiting! Having a plan for splitting up (with meetup times/places) actually makes everyone happier."
+      },
+      "options": [
+        { "value": "together", "label": "I want to stick together the whole time", "emoji": "👨‍👩‍👧‍👦" },
+        { "value": "sometimes", "label": "Split up sometimes, but mostly together", "emoji": "🤝" },
+        { "value": "often", "label": "Happy to split up and meet back later", "emoji": "👋" },
+        { "value": "independent", "label": "I like doing my own thing", "emoji": "🗺️" }
+      ]
+    }
+  ]
+}

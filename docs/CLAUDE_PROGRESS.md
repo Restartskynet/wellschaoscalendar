@@ -268,3 +268,40 @@ supabase secrets set FAMILY_ACCESS_CODE=your-secret-code
 **Build**: PASS | **Tests**: 5/5 PASS
 
 ---
+
+## SLICE 8 - Questionnaires v1
+
+**Status**: COMPLETE
+
+**Content packs** (`src/content/questionnaires/`):
+1. `park-priorities.json` — Ride thrill level, pacing, must-dos, daily budget, group splitting (5 questions)
+2. `food-preferences.json` — Dining style, dietary needs, snack budget allocation, reservations (4 questions)
+3. `travel-comfort.json` — Wake-up time, walking tolerance, heat handling, midday breaks, special needs (5 questions)
+
+All include knowledge cards with informative park tips.
+
+**Components**:
+1. `QuestionnairesPage.tsx` — Hub page with styled list, progress tracker, admin results access
+2. `QuestionnaireEngine.tsx` — Full questionnaire engine supporting:
+   - Single choice (radio-style)
+   - Multi choice (checkbox-style)
+   - Slider / scale
+   - Budget allocation (100 points split)
+   - Knowledge cards (expandable info panels)
+   - Progress bar, animated transitions, completion screen
+3. `QuestionnaireResults.tsx` — Admin-only results view:
+   - Aggregate view: bar charts, consensus indicators, averages
+   - Per-person drilldown: individual answers with outlier context
+4. `src/content/questionnaires/index.ts` — Content pack loader with TypeScript types
+
+**Integration**: Added as "Surveys" tab in the More page (alongside Packing and Budget)
+
+**How to QA**:
+- Navigate to More > Surveys tab
+- Complete a questionnaire — progress bar, knowledge cards, all question types
+- As admin user: view aggregate results after submitting
+- Verify celebratory completion screen
+
+**Build**: PASS | **Tests**: 5/5 PASS
+
+---

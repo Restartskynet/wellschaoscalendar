@@ -1,0 +1,81 @@
+{
+  "slug": "travel-comfort",
+  "title": "Travel Comfort & Logistics",
+  "description": "Help us plan the smoothest trip logistics — from wake-up times to what you need to feel comfortable.",
+  "emoji": "✈️",
+  "questions": [
+    {
+      "id": "wake-time",
+      "type": "single-choice",
+      "question": "What time are you willing to wake up for a park day?",
+      "knowledgeCard": {
+        "title": "Early Entry & Rope Drop",
+        "content": "Disney offers Early Theme Park Entry (30 min early for resort guests). Universal has Early Park Admission for certain hotels. 'Rope drop' means being at the park when it opens — this is THE best time for short waits on headliner rides. Parks often open at 8 or 9 AM, meaning a 6-7 AM wake-up."
+      },
+      "options": [
+        { "value": "early-bird", "label": "5-6 AM — I want rope drop!", "emoji": "🌅" },
+        { "value": "morning", "label": "7-8 AM — Early but reasonable", "emoji": "☀️" },
+        { "value": "late-morning", "label": "9-10 AM — I need my sleep", "emoji": "😴" },
+        { "value": "flexible", "label": "Whatever works for the group", "emoji": "🤷" }
+      ]
+    },
+    {
+      "id": "walking",
+      "type": "slider",
+      "question": "How many miles of walking can you comfortably do in a day?",
+      "knowledgeCard": {
+        "title": "Walking at the Parks",
+        "content": "A typical park day involves 8-15 miles of walking! Comfortable shoes are essential. If walking is a concern, Disney rents wheelchairs ($12/day) and ECVs ($50/day). Taking breaks and sitting for shows helps. Average step count: 20,000-30,000 per day."
+      },
+      "min": 2,
+      "max": 15,
+      "step": 1,
+      "unit": "miles",
+      "labels": { "min": "2 miles", "max": "15+ miles" }
+    },
+    {
+      "id": "heat-tolerance",
+      "type": "single-choice",
+      "question": "How well do you handle Florida heat & humidity?",
+      "knowledgeCard": {
+        "title": "Florida Weather",
+        "content": "Orlando averages 90°F+ with high humidity in summer. Heat index can reach 105°F. Afternoon thunderstorms are common (usually 30-60 min). Tips: drink lots of water (free at counter service), take indoor breaks, carry cooling towels, and wear moisture-wicking clothes."
+      },
+      "options": [
+        { "value": "love-it", "label": "I love the heat — bring it on!", "emoji": "☀️" },
+        { "value": "okay", "label": "I can handle it with breaks", "emoji": "🥤" },
+        { "value": "struggle", "label": "I struggle in heat — need AC breaks", "emoji": "🧊" },
+        { "value": "worried", "label": "Very worried about heat", "emoji": "🥵" }
+      ]
+    },
+    {
+      "id": "midday-break",
+      "type": "single-choice",
+      "question": "Do you want a midday break back at the hotel?",
+      "knowledgeCard": {
+        "title": "The Midday Break Strategy",
+        "content": "Many experienced park-goers do 'rope drop to lunch, hotel break, then evening return.' This avoids peak heat (1-4 PM), lets you recharge, and the parks are often less crowded in the evening. However, it means potentially missing some park time."
+      },
+      "options": [
+        { "value": "yes", "label": "Yes! Pool time + nap = essential", "emoji": "🏊" },
+        { "value": "maybe", "label": "Maybe on the hottest days", "emoji": "🤔" },
+        { "value": "no", "label": "No way — I'm not leaving the park!", "emoji": "💪" },
+        { "value": "flexible", "label": "I'll follow the group", "emoji": "🤝" }
+      ]
+    },
+    {
+      "id": "special-needs",
+      "type": "multi-choice",
+      "question": "Anything else we should plan for? (Select all that apply)",
+      "options": [
+        { "value": "none", "label": "Nothing special — I'm easy!", "emoji": "👍" },
+        { "value": "mobility", "label": "Mobility assistance needed", "emoji": "♿" },
+        { "value": "anxiety", "label": "Crowd/noise anxiety", "emoji": "🧘" },
+        { "value": "sensory", "label": "Sensory sensitivities", "emoji": "🎧" },
+        { "value": "medical", "label": "Medical needs (carrying meds, etc.)", "emoji": "💊" },
+        { "value": "afraid-heights", "label": "Afraid of heights", "emoji": "😰" },
+        { "value": "afraid-dark", "label": "Afraid of dark/enclosed rides", "emoji": "🌑" }
+      ]
+    }
+  ]
+}

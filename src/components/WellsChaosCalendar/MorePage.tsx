@@ -1,6 +1,7 @@
-import { Check, CheckCircle2, Circle, DollarSign, Package, Plus, Trash2, Users } from 'lucide-react';
+import { Check, CheckCircle2, Circle, ClipboardList, DollarSign, Package, Plus, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 import type { Account, BudgetItem, EventTheme, PackingItem, Trip } from '../../types/wellsChaos';
+import QuestionnairesPage from './QuestionnairesPage';
 
 type MorePageProps = {
   trip: Trip;
@@ -13,7 +14,7 @@ type MorePageProps = {
   onUpdateBudgetItems: (items: BudgetItem[]) => void;
 };
 
-type TabType = 'packing' | 'budget';
+type TabType = 'packing' | 'budget' | 'questionnaires';
 
 const MorePage = ({
   trip,
@@ -195,6 +196,17 @@ const MorePage = ({
                   ${totalBudget.toFixed(0)}
                 </span>
               )}
+            </button>
+            <button
+              onClick={() => setActiveTab('questionnaires')}
+              className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
+                activeTab === 'questionnaires'
+                  ? `bg-gradient-to-r ${theme.primary} text-white shadow-md`
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <ClipboardList size={18} />
+              Surveys
             </button>
           </div>
         </div>
@@ -424,6 +436,10 @@ const MorePage = ({
               )}
             </div>
           </div>
+        )}
+        {/* Questionnaires */}
+        {activeTab === 'questionnaires' && (
+          <QuestionnairesPage currentUser={currentUser} accounts={accounts} theme={theme} />
         )}
       </div>
 
