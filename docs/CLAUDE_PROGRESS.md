@@ -75,3 +75,33 @@ Append-only log of implementation slices. Each slice records what changed, why, 
 **Build**: PASS | **Tests**: PASS
 
 ---
+
+## SLICE 2 - Supabase Client + Auth Scaffolding
+
+**Status**: COMPLETE
+
+**Changes**:
+
+1. **Dependencies**: Added `@supabase/supabase-js`
+2. **`src/lib/supabaseClient.ts`**: Supabase client singleton with:
+   - Graceful fallback when env vars not configured (returns null)
+   - Session persistence + auto refresh enabled
+   - Edge function URL helper
+3. **`src/providers/AuthProvider.tsx`**: React context providing:
+   - `session`, `user`, `profile` state
+   - `signIn(username, password, deviceId, deviceToken)` via edge function
+   - `signOut()`
+   - `isLoading`, `isConfigured` flags
+   - Auto-listens for auth state changes
+   - Auto-fetches profile from `profiles` table when user changes
+4. **`src/App.tsx`**: Wrapped `WellsChaosCalendar` with `AuthProvider`
+
+**No behavior change**: Existing prototype auth still works. Supabase auth is wired but dormant (no env vars configured = null client).
+
+**How to QA**:
+- App should function exactly as before (no visible changes)
+- No errors in console about missing Supabase config
+
+**Build**: PASS | **Tests**: PASS
+
+---
