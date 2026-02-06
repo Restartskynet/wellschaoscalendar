@@ -305,3 +305,47 @@ All include knowledge cards with informative park tips.
 **Build**: PASS | **Tests**: 5/5 PASS
 
 ---
+
+## SLICE 9 - Photos Placeholder + Future Plan + README Update
+
+**Status**: COMPLETE
+
+**Changes**:
+
+1. **README.md**: Comprehensive rewrite reflecting new architecture:
+   - Supabase backend documentation
+   - PWA-first + later Capacitor distribution plan
+   - How to configure env vars
+   - How to apply migrations (step by step)
+   - How to deploy edge functions
+   - Keepalive ping option
+   - Security notes with honest residual limitations
+   - Updated project structure
+
+2. **docs/ARCHITECTURE.md**: Updated with:
+   - Questionnaire system documentation
+   - Photos future plan spec (storage bucket, upload limits, thumbnails, quotas)
+   - Distribution roadmap (PWA -> Capacitor)
+
+3. **Photos tab**: Remains as existing placeholder (no changes needed — already well-styled)
+
+**Build**: PASS | **Tests**: 5/5 PASS
+
+---
+
+## Summary — All 10 Slices Complete
+
+| Slice | Description | Status |
+|-------|-------------|--------|
+| 0 | Repo recon + invariants | DONE |
+| 1 | Remove weather + viewport zoom + budget CTA | DONE |
+| 2 | Supabase client + auth scaffolding | DONE |
+| 3 | SQL migrations + RLS policies | DONE |
+| 4 | Edge Functions (gate, login, keepalive) | DONE |
+| 5 | Swap to Supabase auth (preserve login UI) | DONE |
+| 6 | Realtime sync + IndexedDB cache | DONE |
+| 7 | Desktop shell pass | DONE |
+| 8 | Questionnaires v1 | DONE |
+| 9 | Photos placeholder + docs + README | DONE |
+
+**Final state**: Build passes, 5 tests pass, clean working repo.

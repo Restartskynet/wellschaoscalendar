@@ -9,303 +9,228 @@ It's built for trips where everyone wants both:
 
 The goal is simple:
 
-✅ **Everyone knows where to be and when**  
-✅ **Everyone gets guilt-free personal time**  
+✅ **Everyone knows where to be and when**
+✅ **Everyone gets guilt-free personal time**
 ✅ **No confusion, no arguing, no "wait… what's the plan?"**
 
-But the *vibe* matters too:
-
 > This shouldn't feel like a corporate scheduling tool.
-> It should feel like a cute little "trip brain" you actually enjoy opening and gives you all the information you need while on the trip.
+> It should feel like a cute little "trip brain" you actually enjoy opening.
 
 ---
 
-## What this is for
+## Architecture
 
-This calendar is built specifically for theme park trips—especially trips to:
+**Frontend**: Vite + React 18 + TypeScript + Tailwind CSS
+**Backend**: Supabase (Auth, Postgres, Realtime, Edge Functions)
+**Local Cache**: IndexedDB via `idb` for offline-first fast open
+**Distribution**: PWA first; later Capacitor wrap for App Store / Play Store
 
-* Walt Disney World Resort
-* Universal Studios Florida
-
-Where:
-
-* plans change fast,
-* people split up often,
-* energy levels vary wildly,
-* and a "plan in someone's head" becomes an instant disaster.
-
-### The core philosophy
-
-> Plan the anchors (family blocks).  
-> Leave the rest as flexible personal blocks.  
-> Everyone wins.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed technical architecture.
 
 ---
 
-## Current Features ✨
+## Features
 
-### 🔐 Authentication & Roles
-- **Admin Accounts** (Ben & Marie): Full calendar control, create/edit/delete events, assign parks
-- **User Accounts** (Rachel, Chris, Sam, Jacob, Erika, Benny): RSVP to events, add comments
-- Quick test login for easy development
-- Account switcher for testing different user perspectives
-- Custom profile pictures with circular crop
-- Crown badges for admins 👑
+### Authentication & Security
+- **Family-only access**: 3-layer security system
+  - Level 1: Disabled signups, strong passwords, RLS on all tables
+  - Level 2: Username allowlist, rate limiting (5 attempts -> 20min lock)
+  - Level 3: Family access code gate (server-enforced, once per device)
+- Login via username + password (maps to Supabase Auth under the hood)
+- No signups, no email flows, no forgot-password
+- Admin accounts (Ben & Marie) control everything
 
-### 🏠 Home Page
-- **Trip Countdown**: Animated days until trip starts
-- **Current Time Widget**: Live clock with next event preview
-- **Excitement Meter**: Family members rate their excitement (1-5 ⭐)
-- **Park Schedule**: View all trip days, admins can assign parks
-- **Trip Details**: Hotel info, duration, custom notes
-- **Weather Widget (placeholder)**: Orlando weather copy until live data is wired up
+### Home Page
+- Animated trip countdown
+- Live clock with next event preview
+- Park schedule with admin park assignments
+- Trip details (hotel, notes, member count)
 
-### 📅 Calendar Page
-- **Day-by-Day Timeline**: Navigate through trip days
-- **Smart Time Blocks**:
-  - 🎟️ **Family Blocks**: Ticket-style design (orange/pink gradient)
-  - ☁️ **Personal Blocks**: Cloud-style design (blue/purple gradient)
-- **Location Details**: Auto-filled with specific directions (e.g., "Fantasyland, Beast's Castle")
-- **Next Event Banner**: Always visible with time remaining
+### Calendar
+- Day-by-day timeline navigation
+- Family blocks (ticket-style, orange/pink) vs Personal blocks (cloud-style, blue/purple)
+- Location auto-fill from Disney/Universal preset library (100+ attractions, 80+ restaurants)
+- RSVP system with quips
+- Per-event chat
 
-### 🎢 Disney & Universal Integration
-- **Massive Preset Library**:
-  - 100+ attractions across all parks
-  - 80+ restaurants
-  - Shows, parades, and fireworks
-  - Common activities (pool time, shopping, etc.)
-- **Auto-Fill Location**: Specific park directions included
-- **Park Assignment**: Track which park you're visiting each day
+### Questionnaires
+- 3 content packs: Park Priorities, Food Preferences, Travel Comfort
+- Engine supports: single choice, multi choice, slider, budget allocation
+- Knowledge cards with informative park tips for first-timers
+- Admin-only results: aggregate dashboards + per-person drilldown
 
-### 💬 Interactive Features
-- **RSVP System**: 
-  - "Going!" or "Can't Make It" options
-  - Add fun 50-character quips
-  - See who's attending with avatars
-- **Event Chat**: Mini chat for each event block
-- **Admin & User Parity**: Admins can RSVP and interact just like regular users
+### Budget Tracker
+- Shared expense tracking (all members can add)
+- Split calculations with balance summary
+- Edit/delete for admins and expense creators
 
-### 🎨 Personalization
-- **6 Gorgeous Themes**:
-  - 🏰 Magic Kingdom (pink/purple)
-  - 🌍 EPCOT (blue/cyan)
-  - 🎬 Hollywood Studios (yellow/orange)
-  - 🌳 Animal Kingdom (green/emerald)
-  - ⚡ Universal (indigo/purple)
-  - 💜 Classic Purple
-- **Enhanced Theme Selector**: Clear visual indication with ring, scale, and checkmark
-- **Custom Avatars**: Upload and crop circular profile pictures
-- **Personal Theme Settings**: Each family member picks their favorite
+### Packing List
+- Admin-managed base list (shared across trip)
+- Checkbox progress tracking
 
-### 📱 Mobile-First Design
-- **Bottom Navigation**: Easy switching between pages
-- **Touch-Friendly**: Large tap targets, optimized for on-the-go
-- **Responsive**: Works beautifully on phones, tablets, and desktop
-- **Safe Area Support**: Respects device notches and home indicators
+### Photos (Placeholder)
+- Coming soon: Supabase Storage upload with per-user limits
+- See `docs/ARCHITECTURE.md` for future spec
 
----
-
-## Distribution Plan (PWA first → App Store / Play Store later)
-
-### PWA (now)
-Right now this project ships as a **PWA** (a web app that can be “installed” from the browser). It’s perfect for fast iteration and family-only usage.
-
-### App Store / Play Store (later milestone)
-A store app is a **packaged native app** distributed through Apple/Google stores. You can still reuse this exact Vite/React code by **wrapping it** (common approach), but it introduces:
-- store builds and store review
-- versioning + release process
-- easier access to certain native behaviors/permissions
-
-**Clean path:** Build as a PWA first (fast iteration), then when it’s launch-ready, wrap with something like **Capacitor** and publish to iOS/Android stores — without rewriting the whole app.
-
-
----
-
-## Design Philosophy
-
-### ✦ Visual Identity
-
-* Cute, warm, pastel colors, playful (but not childish)
-* Vacation energy: bright, airy, happy
-* Calendar that feels like a **storybook itinerary**
-* Visual clarity at a glance (no dense lists)
-
-### ✦ Animation Goals
-
-Animations are **decoration** and **communication**:
-
-* Soft transitions between days (swipe/slide)
-* Blocks "snap" into place with slideIn animation
-* Gentle "pulse" for upcoming events
-* Pop-in animations for RSVPs
-* Bounce animation for countdown timer
-* Delightful empty states (clouds instead of "no events")
-
-**Rule:** Animations stay lightweight (mobile-first), never laggy or distracting.
-
----
-
-## Design Rules (Non-Negotiable)
-
-This project dies if it becomes ugly, confusing, or corporate.
-
-1. **Mobile-first, thumb-friendly**  
-   Used while walking, sweating, holding snacks, wrangling people.
-
-2. **Glanceable clarity**  
-   Your eyes should "read the day" in 2 seconds.
-
-3. **Fun visuals without clutter**  
-   Cute ≠ messy. Cute + clean is the goal.
-
-4. **Animations must help comprehension**  
-   No flashy junk. No lag. No "app store scam vibes."
-
-5. **Flexible by default**  
-   Most of the day should be personal/free time. Anchors are intentional.
-
----
-
-## Information Model (Data Structure)
-
-### Trip
-* name
-* start date, end date
-* members (array of account objects)
-* hotel (name, address)
-* notes
-* days (array)
-
-### Day
-* date
-* park (optional - assigned by admins)
-* blocks (array of time blocks)
-
-### Block
-* type: `FAMILY` or `PERSONAL`
-* title
-* start time, end time
-* location (with specific directions)
-* park
-* notes
-* rsvps (array of { username, status, quip })
-* chats (array of { username, message, timestamp })
-
-### User Account
-* username
-* password (preset for testing)
-* name
-* role: `admin` or `user`
-* defaultAvatar (emoji)
-* customAvatar (uploaded image URL)
-* theme (selected theme name)
-
----
-
-## Tech Stack
-
-### Frontend
-- **React 18** with Hooks
-- **Tailwind CSS** for styling
-- **Lucide React** for icons
-- Custom animations with CSS keyframes
-
-### Future Backend (Planned)
-- **Next.js** for server-side rendering
-- **NextAuth.js** for authentication
-- **Vercel** for deployment
-- **GitHub** for version control
-
-### Current State
-- Fully functional React prototype
-- In-memory state management
-- No backend required for testing
-
----
-
-## Roadmap
-
-### ✅ v1 — "We will use this on the trip" (COMPLETED)
-- [x] Timeline per day with navigation
-- [x] Create/edit/delete blocks (admin only)
-- [x] Strong visual distinction between block types
-- [x] Family & personal time blocks
-- [x] RSVP system with quips
-- [x] Location details with park-specific directions
-- [x] Event chat
-- [x] Park schedule
-- [x] Excitement meter
-- [x] Trip countdown
-- [x] Weather widget
-- [x] Theme customization
-
-### 🚧 v2 — "Make it delightful" (IN PROGRESS)
-- [x] Better day navigation
-- [x] Per-person customization (themes, avatars)
-- [x] Quick add templates (extensive presets for Disney/Universal)
-- [x] "Next event" banner
-- [ ] Photos page with memory sharing allowing users to upload photos to a gallery
-- [ ] A page to chat and have conversations
-- [ ] Packing checklist (admin managed)
-- [ ] Budget splitter
-- [ ] Shareable read-only links
-
-### 🔮 v3 — "Trip brain mode" (PLANNED)
-- [ ] Push notifications for upcoming events
-- [ ] Offline support with service workers
-- [ ] Real-time sync across devices
-- [ ] Check-in/status updates
-- [ ] Export to calendar (ICS)
-- [ ] Trip recap video/slideshow
-- [ ] Other ideas not thought of yet
-
----
-
-## Family Accounts
-
-### Admins
-- **Ben** (`ben` / `magic2024`) 👨 - Can manage entire calendar
-- **Marie** (`marie` / `disney123`) 👩 - Can manage entire calendar
-
-### Users
-- **Rachel** (`rachel` / `rides4eva`) 👧
-- **Chris** (`chris` / `universal1`) 👦
-- **Sam** (`sam` / `vacation!`) 🧒
-- **Jacob** (`jacob` / `funtime99`) 👶
-- **Erika** (`erika` / `princess2`) 👧
-- **Benny** (`benny` / `explorer7`) 🧑
+### Desktop Support
+- Mobile-first with bottom navigation
+- Desktop (>= 1024px): sidebar layout with centered content
+- iOS safe area handling preserved
 
 ---
 
 ## Getting Started
 
-### Development
-1. Clone the repository
-2. Open in your development environment
-3. Quick test login as any family member
-4. Create a trip and start planning!
+### Prerequisites
+- Node.js 18+
+- npm
 
-### Creating Your First Trip
-1. Login as **Ben** or **Marie** (admins)
-2. Click "Create Your Trip"
-3. Enter trip name, dates, and optional hotel details
-4. Start adding events using the massive Disney/Universal preset library!
+### Development (no Supabase needed)
 
-### Testing Features
-1. Login as admin, create events
-2. Switch accounts (Users icon) to test as regular user
-3. RSVP to events, add fun quips
-5. Chat on events
-6. Rate your excitement level
+```bash
+# Install dependencies
+npm install
+
+# Start dev server
+npm run dev
+
+# Run tests
+npm test
+
+# Build for production
+npm run build
+```
+
+In dev mode, the app works with preset accounts and in-memory state. No Supabase project required.
+
+### Development Accounts (dev mode only)
+
+**Admins**: ben/magic2024, marie/disney123
+**Users**: rachel/rides4eva, chris/universal1, sam/vacation!, jacob/funtime99, erika/princess2, benny/explorer7
+
+### Configuring Supabase (production)
+
+1. Create a Supabase project at [supabase.com](https://supabase.com)
+
+2. Copy `.env.example` to `.env.local` and fill in your values:
+```bash
+cp .env.example .env.local
+```
+
+3. Apply database migrations (in order):
+```bash
+# Via Supabase SQL editor or psql
+psql $DATABASE_URL -f supabase/migrations/001_profiles.sql
+psql $DATABASE_URL -f supabase/migrations/002_trips.sql
+psql $DATABASE_URL -f supabase/migrations/003_days_blocks.sql
+psql $DATABASE_URL -f supabase/migrations/004_rsvps_messages.sql
+psql $DATABASE_URL -f supabase/migrations/005_budget.sql
+psql $DATABASE_URL -f supabase/migrations/006_packing.sql
+psql $DATABASE_URL -f supabase/migrations/007_questionnaires.sql
+psql $DATABASE_URL -f supabase/migrations/008_security.sql
+```
+
+4. Deploy Edge Functions:
+```bash
+supabase functions deploy family_gate
+supabase functions deploy family_login
+supabase functions deploy keepalive
+```
+
+5. Set secrets:
+```bash
+supabase secrets set FAMILY_ACCESS_CODE=your-secret-family-code
+```
+
+6. Disable signups in Supabase Dashboard > Auth > Settings
+
+7. Create user accounts using Supabase Admin API or Dashboard:
+   - Email format: `username@wellschaos.family`
+   - Insert matching row in `profiles` table
+
+### Keepalive (optional)
+
+To prevent Supabase free tier from pausing, set up a free uptime monitor (UptimeRobot, Cron-Job.org) to ping:
+```
+https://your-project.supabase.co/functions/v1/keepalive
+```
+Every 5-10 minutes.
 
 ---
 
-## Deployment (Future)
+## Distribution Plan
 
-Planned deployment on **Vercel**:
-- GitHub repository: `main` branch → production
-- Automatic deployments on push
-- Preview deployments for pull requests
+### PWA (current)
+Ships as a progressive web app. Install from browser on any device.
+
+### App Store / Play Store (later milestone)
+Wrap with **Capacitor** for native distribution without rewriting:
+- Reuse the same Vite/React codebase
+- Add native push notifications
+- App store presence for easier family access
+
+---
+
+## Security Notes
+
+### What's enforced server-side
+- Family access code gate (Edge Function validates, issues device token)
+- Username allowlist (only family usernames can attempt login)
+- Rate limiting: 5 attempts/username -> 20min lock, 30 attempts/IP per 10min
+- RLS on all database tables (members can only access their trip data)
+- Disabled signups at the Supabase Auth level
+
+### Residual limitations (documented honestly)
+- The Supabase anon key is visible in client-side JavaScript
+- A determined attacker who reverse-engineers the key could attempt direct Supabase Auth calls, bypassing the edge function rate limiting
+- **Mitigation**: Strong passwords + RLS policies remain the critical last line of defense
+- This is a family app, not a banking app — the security model is appropriate for the threat level
+
+---
+
+## Design Philosophy
+
+### Visual Identity
+* Cute, warm, pastel colors, playful (but not childish)
+* Vacation energy: bright, airy, happy
+* Calendar that feels like a **storybook itinerary**
+* Visual clarity at a glance
+
+### Non-Negotiable Rules
+1. **Mobile-first, thumb-friendly** — used while walking, sweating, holding snacks
+2. **Glanceable clarity** — read the day in 2 seconds
+3. **Fun visuals without clutter** — cute + clean
+4. **Animations must help comprehension** — no flashy junk
+5. **Flexible by default** — most time is personal/free
+
+---
+
+## Project Structure
+
+```
+src/
+  main.tsx                          Entry point
+  App.tsx                           Root wrapper (AuthProvider)
+  lib/
+    supabaseClient.ts               Supabase client singleton
+    localCache.ts                   IndexedDB cache layer
+    realtimeSync.ts                 Supabase Realtime subscriptions
+  providers/
+    AuthProvider.tsx                 Auth context
+  content/
+    questionnaires/                 Questionnaire content packs (JSON)
+  components/
+    WellsChaosCalendar/             All UI components
+supabase/
+  migrations/                       SQL migrations (001-008)
+  functions/
+    family_gate/                    Access code verification
+    family_login/                   Login with rate limiting
+    keepalive/                      Health check
+docs/
+  ARCHITECTURE.md                   Technical architecture
+  CLAUDE_PROGRESS.md                Implementation progress log
+```
 
 ---
 
@@ -315,21 +240,5 @@ All Disney and Universal park names, attraction names, and restaurant names are 
 
 ---
 
-## Why This Exists (The Honest Version)
-
-Family trips are amazing — but the logistics can get dumb fast.
-
-This is a lightweight, cute, visual system that:
-
-* prevents misunderstandings,
-* protects personal downtime,
-* and makes together moments intentional.
-
-**No more "wait, what was the plan?"**  
-**No more guilt about needing a break.**  
-**Just a happy family, having fun, together and apart.**
-
----
-
-**Built with ❤️ by Ben & Marie**  
+**Built with ❤️ by Ben & Marie**
 *Organized by Ben & Marie ✨*

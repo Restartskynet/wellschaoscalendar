@@ -105,3 +105,33 @@ Defined in `src/types/wellsChaos.ts`:
 - `TripDay` (date, park, blocks)
 - `TimeBlock` (type, title, times, location, rsvps, chats)
 - `PackingItem`, `BudgetItem`, `ChatMessage`, `RSVP`
+
+## Questionnaire System
+
+Content packs stored in `src/content/questionnaires/` as JSON:
+- Each pack has: slug, title, description, emoji, questions[]
+- Question types: single-choice, multi-choice, slider, budget-allocation
+- Knowledge cards: embedded info cards per question for park newcomers
+- Responses stored in `questionnaire_responses` table (jsonb answers)
+- Results: admin-only aggregate dashboards + per-person drilldown
+
+## Photos (Future Plan)
+
+Photos tab is currently a placeholder. Future implementation spec:
+
+- **Storage**: Supabase Storage bucket (`trip-photos`)
+- **Upload limits**: Max 5MB per image, 50 photos per user per trip
+- **Thumbnails**: Generate on upload via Supabase Edge Function or client-side (sharp/canvas)
+- **Organization**: By trip day, with optional captions
+- **Quota enforcement**: Track upload count in DB, reject over-quota
+- **RLS**: Trip members can read all photos; users can only delete their own uploads
+- **Display**: Masonry grid or horizontal scroll per day
+
+## Distribution Roadmap
+
+1. **PWA** (current): Installable from browser, works on all devices
+2. **Capacitor wrap** (future milestone):
+   - Same Vite/React codebase
+   - Native push notifications via Capacitor Push
+   - App Store / Play Store distribution
+   - Deep linking support
