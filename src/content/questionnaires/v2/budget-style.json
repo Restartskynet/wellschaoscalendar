@@ -1,0 +1,70 @@
+{
+  "slug": "budget-style-v2",
+  "title": "Budget & Trip Style",
+  "description": "Help us balance magical experiences with smart spending!",
+  "emoji": "💰",
+  "questions": [
+    {
+      "id": "overall-spending",
+      "type": "single-choice",
+      "question": "What's your spending comfort level for the trip?",
+      "knowledgeCard": {
+        "title": "What Does a Disney Trip Actually Cost?",
+        "content": "Here's a realistic breakdown per person per day: Park tickets ($110-170/day depending on park hopper and date), food ($50-100/day), souvenirs ($20-50), Lightning Lane/Genie+ ($15-30). Hotel is usually the biggest cost but split among the family. Money-saving secrets: bring ponchos from home ($2 vs $15 in park), pack snacks, use refillable water bottles, eat a big breakfast at the hotel, and watch for Target/Costco gift card deals on Disney gift cards (save 5-10%)!"
+      },
+      "options": [
+        { "value": "budget", "label": "Budget-conscious — let's be smart about spending", "emoji": "💵" },
+        { "value": "moderate", "label": "Moderate — willing to splurge on key experiences", "emoji": "💳" },
+        { "value": "comfortable", "label": "Comfortable — this is a special trip!", "emoji": "💎" },
+        { "value": "no-limit", "label": "Whatever it takes for the best experience", "emoji": "🌟" }
+      ]
+    },
+    {
+      "id": "priority-spending",
+      "type": "budget-allocation",
+      "question": "If you had 100 magic points, how would you spend them?",
+      "knowledgeCard": {
+        "title": "Where Your Money Goes the Furthest",
+        "content": "Lightning Lane ($15-30/day) can save 2+ hours of waiting — huge value on busy days. Character dining ($40-60/person) is pricey but an unforgettable experience. Souvenirs range from $5 pressed pennies to $60+ Spirit Jerseys. Park hopper upgrades ($60-70 total) let you visit multiple parks in one day. Tip: free things that are amazing include fireworks, parades, resort hopping (monorail to Grand Floridian is gorgeous), and Disney Springs entertainment!"
+      },
+      "total": 100,
+      "categories": [
+        { "id": "food-drink", "label": "Food & Drinks", "emoji": "🍽️" },
+        { "id": "rides-skip-line", "label": "Skip-the-Line Passes", "emoji": "⚡" },
+        { "id": "souvenirs", "label": "Souvenirs & Shopping", "emoji": "🎁" },
+        { "id": "special-experiences", "label": "Special Experiences (tours, events)", "emoji": "✨" },
+        { "id": "dining-upgrades", "label": "Fancy Dining / Character Meals", "emoji": "👑" }
+      ]
+    },
+    {
+      "id": "souvenir-style",
+      "type": "single-choice",
+      "question": "What's your souvenir style?",
+      "knowledgeCard": {
+        "title": "Souvenir Pro Tips",
+        "content": "Disney souvenirs range from $1 pressed pennies (collect them all!) to $250+ lightsabers you build at Galaxy's Edge. Smart souvenir tips: Disney pins are a huge collectible culture — you can trade with cast members! Pressed penny machines are in every park ($0.51 each). The best deals on t-shirts and plush toys are at the Disney outlet stores, not in-park shops. Universal's Wizarding World wands ($55) are interactive — they make fountains and windows respond to your spells!"
+      },
+      "options": [
+        { "value": "none", "label": "I don't need souvenirs", "emoji": "🙅" },
+        { "value": "small", "label": "Something small to remember the trip", "emoji": "🧲" },
+        { "value": "some", "label": "A few special things — shirts, pins, etc.", "emoji": "🛍️" },
+        { "value": "big", "label": "I want to shop! Lightsaber, wand, the works!", "emoji": "⚔️" }
+      ]
+    },
+    {
+      "id": "photo-memory",
+      "type": "single-choice",
+      "question": "How important are trip photos to you?",
+      "knowledgeCard": {
+        "title": "Disney PhotoPass & Memory Maker",
+        "content": "Disney has professional photographers stationed at every iconic spot — Cinderella Castle, in front of Spaceship Earth, with characters, and even ON rides! Memory Maker ($169 total, not per person) gives you unlimited digital downloads of all PhotoPass photos for your entire group during the trip. That's ALL the professional photos, ride photos, and Magic Shots (where they add Tinkerbell to your photo!). Split among 9 people, that's under $20 each — amazing value!"
+      },
+      "options": [
+        { "value": "phone-fine", "label": "My phone camera is fine", "emoji": "📱" },
+        { "value": "some-pro", "label": "I'd love some professional photos at key spots", "emoji": "📸" },
+        { "value": "memory-maker", "label": "Memory Maker sounds perfect for our group!", "emoji": "🌟" },
+        { "value": "photographer", "label": "I'm the family photographer — I'll handle it!", "emoji": "🎞️" }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { ChevronLeft, User } from 'lucide-react';
+import { ChevronLeft, User, AlertTriangle, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import type { QuestionnairePack, Question } from '../../content/questionnaires';
 import type { Account, EventTheme } from '../../types/wellsChaos';
@@ -13,12 +13,82 @@ type Props = {
 
 type ViewMode = 'aggregate' | 'per-person';
 
+/** Find outlier answers — people who picked something nobody else did */
+function findOutliers(
+  question: Question,
+  responses: Record<string, Record<string, unknown>>,
+  accounts: Account[]
+): { username: string; name: string; answer: string }[] {
+  if (question.type !== 'single-choice') return [];
+  const allAnswers = Object.entries(responses)
+    .map(([u, r]) => ({ username: u, answer: r[question.id] as string }))
+    .filter((a) => a.answer !== undefined);
+
+  if (allAnswers.length < 3) return []; // need enough data
+
+  const counts: Record<string, number> = {};
+  allAnswers.forEach((a) => { counts[a.answer] = (counts[a.answer] || 0) + 1; });
+
+  // Outlier = picked by only 1 person when others converge
+  return allAnswers
+    .filter((a) => counts[a.answer] === 1)
+    .map((a) => {
+      const account = accounts.find((ac) => ac.username === a.username);
+      const opt = question.options?.find((o) => o.value === a.answer);
+      return {
+        username: a.username,
+        name: account?.name || a.username,
+        answer: opt ? `${opt.emoji || ''} ${opt.label}` : a.answer,
+      };
+    });
+}
+
+/** Generate quick-glance insights from all responses */
+function generateInsights(
+  pack: QuestionnairePack,
+  responses: Record<string, Record<string, unknown>>
+): string[] {
+  const insights: string[] = [];
+  const respondents = Object.keys(responses);
+  if (respondents.length === 0) return insights;
+
+  for (const q of pack.questions) {
+    const answers = respondents.map((u) => responses[u]?.[q.id]).filter((a) => a !== undefined);
+    if (answers.length === 0) continue;
+
+    if (q.type === 'single-choice') {
+      const counts: Record<string, number> = {};
+      answers.forEach((a) => { counts[a as string] = (counts[a as string] || 0) + 1; });
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      if (sorted[0][1] === answers.length) {
+        const opt = q.options?.find((o) => o.value === sorted[0][0]);
+        insights.push(`Everyone picked ${opt?.emoji || ''} ${opt?.label || sorted[0][0]}!`);
+      }
+    }
+
+    if (q.type === 'slider') {
+      const values = answers.map((a) => a as number);
+      const avg = values.reduce((s, v) => s + v, 0) / values.length;
+      const spread = Math.max(...values) - Math.min(...values);
+      if (spread <= 1 && values.length > 2) {
+        insights.push(`Group is aligned on "${q.question}" (avg ${Math.round(avg)})`);
+      } else if (spread >= (q.max || 10) * 0.6) {
+        insights.push(`Big range on "${q.question}" — might need a compromise!`);
+      }
+    }
+  }
+
+  return insights.slice(0, 3); // cap at 3
+}
+
 const QuestionnaireResults = ({ pack, theme, accounts, responses, onBack }: Props) => {
   const [viewMode, setViewMode] = useState<ViewMode>('aggregate');
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
   const respondents = Object.keys(responses);
   const responseCount = respondents.length;
+  const totalMembers = accounts.length;
+  const insights = generateInsights(pack, responses);
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${theme.bg} pb-24`}>
@@ -31,7 +101,7 @@ const QuestionnaireResults = ({ pack, theme, accounts, responses, onBack }: Prop
             </button>
             <div>
               <h1 className="font-bold text-gray-800">{pack.emoji} {pack.title}</h1>
-              <p className="text-xs text-gray-500">{responseCount} responses</p>
+              <p className="text-xs text-gray-500">{responseCount} / {totalMembers} responded</p>
             </div>
           </div>
 
@@ -62,10 +132,25 @@ const QuestionnaireResults = ({ pack, theme, accounts, responses, onBack }: Prop
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
+        {/* Insights card */}
+        {viewMode === 'aggregate' && insights.length > 0 && (
+          <div className={`bg-gradient-to-r ${theme.primary} rounded-2xl p-4 text-white`}>
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp size={16} />
+              <span className="text-sm font-semibold opacity-90">Quick Insights</span>
+            </div>
+            <ul className="space-y-1">
+              {insights.map((insight, i) => (
+                <li key={i} className="text-sm opacity-90">• {insight}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {viewMode === 'aggregate' && (
           <>
             {pack.questions.map((q) => (
-              <AggregateQuestion key={q.id} question={q} responses={responses} theme={theme} />
+              <AggregateQuestion key={q.id} question={q} responses={responses} accounts={accounts} theme={theme} />
             ))}
           </>
         )}
@@ -94,6 +179,18 @@ const QuestionnaireResults = ({ pack, theme, accounts, responses, onBack }: Prop
                 </button>
               );
             })}
+            {/* Show who hasn't responded yet */}
+            {responseCount < totalMembers && (
+              <div className="bg-amber-50 rounded-xl p-3 border border-amber-200 mt-3">
+                <div className="text-xs font-medium text-amber-700 mb-1">Waiting on:</div>
+                <div className="text-xs text-amber-600">
+                  {accounts
+                    .filter((a) => !respondents.includes(a.username))
+                    .map((a) => a.name)
+                    .join(', ')}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -110,10 +207,18 @@ const QuestionnaireResults = ({ pack, theme, accounts, responses, onBack }: Prop
             </h2>
             {pack.questions.map((q) => {
               const answer = responses[selectedUser]?.[q.id];
+              const outliers = findOutliers(q, responses, accounts);
+              const isOutlier = outliers.some((o) => o.username === selectedUser);
               return (
-                <div key={q.id} className="bg-white rounded-xl p-4 shadow-sm">
+                <div key={q.id} className={`bg-white rounded-xl p-4 shadow-sm ${isOutlier ? 'ring-2 ring-amber-300' : ''}`}>
                   <div className="text-sm font-medium text-gray-500 mb-1">{q.question}</div>
                   <div className="font-semibold text-gray-800">{formatAnswer(q, answer)}</div>
+                  {isOutlier && (
+                    <div className="mt-2 flex items-center gap-1 text-xs text-amber-600">
+                      <AlertTriangle size={12} />
+                      Unique pick — different from everyone else
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -127,10 +232,12 @@ const QuestionnaireResults = ({ pack, theme, accounts, responses, onBack }: Prop
 function AggregateQuestion({
   question,
   responses,
+  accounts,
   theme,
 }: {
   question: Question;
   responses: Record<string, Record<string, unknown>>;
+  accounts: Account[];
   theme: EventTheme;
 }) {
   const allAnswers = Object.values(responses)
@@ -186,14 +293,25 @@ function AggregateQuestion({
             );
           })}
         </div>
-        {/* Consensus indicator */}
-        {sorted.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <span className="text-xs text-gray-400">
-              Consensus: {sorted[0][1] === allAnswers.length ? 'Unanimous!' : sorted[0][1] > allAnswers.length / 2 ? 'Strong' : 'Mixed'}
-            </span>
-          </div>
-        )}
+        {/* Consensus indicator + outlier highlight */}
+        {sorted.length > 0 && (() => {
+          const outliers = findOutliers(question, responses, accounts);
+          return (
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <span className="text-xs text-gray-400">
+                Consensus: {sorted[0][1] === allAnswers.length ? 'Unanimous!' : sorted[0][1] > allAnswers.length / 2 ? 'Strong' : 'Mixed'}
+              </span>
+              {outliers.length > 0 && (
+                <div className="mt-2 flex items-start gap-1.5 text-xs text-amber-600 bg-amber-50 rounded-lg p-2">
+                  <AlertTriangle size={12} className="mt-0.5 flex-shrink-0" />
+                  <span>
+                    {outliers.map((o) => o.name).join(', ')} picked differently — worth a conversation?
+                  </span>
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
     );
   }

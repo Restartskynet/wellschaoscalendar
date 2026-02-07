@@ -3,8 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import QuestionnairesPage from './QuestionnairesPage';
 import MorePage from './MorePage';
+import { AuthProvider } from '../../providers/AuthProvider';
 import { THEMES } from '../../data/themes';
-import type { Account, Trip, PackingItem, BudgetItem } from '../../types/wellsChaos';
+import type { Account, Trip } from '../../types/wellsChaos';
 
 const theme = THEMES.Default;
 
@@ -46,17 +47,19 @@ describe('Questionnaire Focus Mode', () => {
     const onFocusModeChange = vi.fn();
 
     render(
-      <QuestionnairesPage
-        currentUser={userAccount}
-        accounts={accounts}
-        theme={theme}
-        onFocusModeChange={onFocusModeChange}
-      />
+      <AuthProvider>
+        <QuestionnairesPage
+          currentUser={userAccount}
+          accounts={accounts}
+          theme={theme}
+          onFocusModeChange={onFocusModeChange}
+        />
+      </AuthProvider>
     );
 
     // Click the first questionnaire
     const firstQuestionnaireButton = screen.getAllByRole('button').find(
-      (btn) => btn.textContent?.includes('Park Day Priorities')
+      (btn) => btn.textContent?.includes('Park Day Adventures')
     );
     expect(firstQuestionnaireButton).toBeTruthy();
     await user.click(firstQuestionnaireButton!);
@@ -70,17 +73,19 @@ describe('Questionnaire Focus Mode', () => {
     const onFocusModeChange = vi.fn();
 
     render(
-      <QuestionnairesPage
-        currentUser={userAccount}
-        accounts={accounts}
-        theme={theme}
-        onFocusModeChange={onFocusModeChange}
-      />
+      <AuthProvider>
+        <QuestionnairesPage
+          currentUser={userAccount}
+          accounts={accounts}
+          theme={theme}
+          onFocusModeChange={onFocusModeChange}
+        />
+      </AuthProvider>
     );
 
     // Start a questionnaire
     const firstQuestionnaireButton = screen.getAllByRole('button').find(
-      (btn) => btn.textContent?.includes('Park Day Priorities')
+      (btn) => btn.textContent?.includes('Park Day Adventures')
     );
     await user.click(firstQuestionnaireButton!);
 
@@ -96,16 +101,18 @@ describe('Questionnaire Focus Mode', () => {
     const user = userEvent.setup();
 
     render(
-      <QuestionnairesPage
-        currentUser={userAccount}
-        accounts={accounts}
-        theme={theme}
-      />
+      <AuthProvider>
+        <QuestionnairesPage
+          currentUser={userAccount}
+          accounts={accounts}
+          theme={theme}
+        />
+      </AuthProvider>
     );
 
     // Start a questionnaire
     const firstQuestionnaireButton = screen.getAllByRole('button').find(
-      (btn) => btn.textContent?.includes('Park Day Priorities')
+      (btn) => btn.textContent?.includes('Park Day Adventures')
     );
     await user.click(firstQuestionnaireButton!);
 

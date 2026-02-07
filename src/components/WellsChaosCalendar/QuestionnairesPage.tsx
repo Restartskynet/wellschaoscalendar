@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { ChevronRight, CheckCircle2, Circle, BarChart3 } from 'lucide-react';
 import { QUESTIONNAIRE_PACKS } from '../../content/questionnaires';
+import { isSupabaseConfigured } from '../../lib/supabaseClient';
+import { saveQuestionnaireResponse } from '../../lib/supabaseData';
+import { useAuth } from '../../providers/AuthProvider';
 import type { Account, EventTheme } from '../../types/wellsChaos';
 import QuestionnaireEngine from './QuestionnaireEngine';
 import QuestionnaireResults from './QuestionnaireResults';
@@ -12,7 +15,7 @@ type QuestionnairesPageProps = {
   onFocusModeChange?: (active: boolean) => void;
 };
 
-// In-memory response store (will be Supabase-backed when connected)
+// In-memory response store (also Supabase-backed when connected)
 type ResponseStore = Record<string, Record<string, unknown>>;
 const globalResponses: Record<string, ResponseStore> = {};
 
@@ -22,6 +25,8 @@ const QuestionnairesPage = ({ currentUser, accounts, theme, onFocusModeChange }:
   const [completedSlugs, setCompletedSlugs] = useState<Set<string>>(new Set());
 
   const isAdmin = currentUser.role === 'admin';
+  const supabaseMode = isSupabaseConfigured();
+  const auth = useAuth();
 
   // Notify parent when focus mode should change
   useEffect(() => {
@@ -30,11 +35,16 @@ const QuestionnairesPage = ({ currentUser, accounts, theme, onFocusModeChange }:
   }, [activeQuestionnaire, onFocusModeChange]);
 
   const handleComplete = (slug: string, answers: Record<string, unknown>) => {
-    // Store answers per user per questionnaire
+    // Store answers per user per questionnaire (local)
     if (!globalResponses[slug]) globalResponses[slug] = {};
     globalResponses[slug][currentUser.username] = answers;
     setCompletedSlugs((prev) => new Set([...prev, slug]));
     setActiveQuestionnaire(null);
+
+    // Persist to Supabase if configured
+    if (supabaseMode && auth.user) {
+      saveQuestionnaireResponse(slug, auth.user.id, answers, true).catch(() => {});
+    }
   };
 
   if (activeQuestionnaire) {

@@ -1,6 +1,8 @@
-import parkPriorities from './park-priorities.json';
-import foodPreferences from './food-preferences.json';
-import travelComfort from './travel-comfort.json';
+import parkAdventures from './v2/park-adventures.json';
+import diningDreams from './v2/dining-dreams.json';
+import comfortPlanning from './v2/comfort-planning.json';
+import budgetStyle from './v2/budget-style.json';
+import magicalMoments from './v2/magical-moments.json';
 
 export type KnowledgeCard = {
   title: string;
@@ -45,9 +47,11 @@ export type QuestionnairePack = {
 };
 
 export const QUESTIONNAIRE_PACKS: QuestionnairePack[] = [
-  parkPriorities as QuestionnairePack,
-  foodPreferences as QuestionnairePack,
-  travelComfort as QuestionnairePack,
+  parkAdventures as QuestionnairePack,
+  diningDreams as QuestionnairePack,
+  comfortPlanning as QuestionnairePack,
+  budgetStyle as QuestionnairePack,
+  magicalMoments as QuestionnairePack,
 ];
 
 export const getQuestionnaire = (slug: string): QuestionnairePack | undefined => {

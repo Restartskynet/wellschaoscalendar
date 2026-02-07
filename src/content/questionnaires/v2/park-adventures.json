@@ -1,0 +1,111 @@
+{
+  "slug": "park-priorities-v2",
+  "title": "Park Day Adventures",
+  "description": "Which parks excite you most? Help Ben & Marie build the perfect park day lineup!",
+  "emoji": "🏰",
+  "questions": [
+    {
+      "id": "most-excited-park",
+      "type": "single-choice",
+      "question": "Which park are you MOST excited to visit?",
+      "knowledgeCard": {
+        "title": "The Parks at a Glance",
+        "content": "Walt Disney World has FOUR theme parks: Magic Kingdom (classic Disney with Cinderella Castle), EPCOT (world culture + future tech), Hollywood Studios (movies + Star Wars), and Animal Kingdom (nature + Avatar). Universal Orlando has Universal Studios (movies + rides), Islands of Adventure (Harry Potter + Marvel), and the brand-new Epic Universe opening 2025! Each park has its own personality — there's no wrong choice!"
+      },
+      "options": [
+        { "value": "magic-kingdom", "label": "Magic Kingdom — Cinderella Castle, classic Disney magic", "emoji": "🏰" },
+        { "value": "epcot", "label": "EPCOT — World Showcase, Guardians of the Galaxy ride", "emoji": "🌍" },
+        { "value": "hollywood-studios", "label": "Hollywood Studios — Star Wars: Galaxy's Edge!", "emoji": "🎬" },
+        { "value": "animal-kingdom", "label": "Animal Kingdom — Pandora, safari adventures", "emoji": "🦁" },
+        { "value": "universal-studios", "label": "Universal Studios — Transformers, Minions, Horror Nights", "emoji": "🎥" },
+        { "value": "islands-of-adventure", "label": "Islands of Adventure — Hagrid's, Velocicoaster", "emoji": "🧙" },
+        { "value": "all-of-them", "label": "I want to see ALL of them!", "emoji": "🤩" }
+      ]
+    },
+    {
+      "id": "ride-thrill-v2",
+      "type": "single-choice",
+      "question": "How brave are you feeling about rides?",
+      "knowledgeCard": {
+        "title": "Ride Intensity Guide",
+        "content": "The parks have rides for EVERY comfort level! Gentle: It's a Small World, The Seas with Nemo, Buzz Lightyear. Moderate: Pirates of the Caribbean, Frozen Ever After, Haunted Mansion. Thrilling: Space Mountain, Expedition Everest, Test Track. Extreme: Velocicoaster (Universal's 70mph coaster!), Guardians of the Galaxy: Cosmic Rewind, Hagrid's Motorbike Adventure. No pressure — the group can split up for the big ones!"
+      },
+      "options": [
+        { "value": "gentle", "label": "Keep it gentle — shows, scenery, and easy rides", "emoji": "🌸" },
+        { "value": "moderate", "label": "Moderate — a mix of calm and some excitement", "emoji": "🎠" },
+        { "value": "thrilling", "label": "I want thrills! Roller coasters, yes please!", "emoji": "🎢" },
+        { "value": "extreme", "label": "Give me EVERYTHING — the wilder the better!", "emoji": "🚀" }
+      ]
+    },
+    {
+      "id": "must-do-experiences",
+      "type": "multi-choice",
+      "question": "Which experiences are on your MUST-DO list?",
+      "knowledgeCard": {
+        "title": "Can't-Miss Experiences",
+        "content": "Some things sell out fast! Character dining (eating breakfast with Mickey!) should be booked 60 days ahead. Lightning Lane reservations for top rides (like Tron, Guardians, and Hagrid's) go FAST. The Wizarding World of Harry Potter lets you buy a real interactive wand and cast spells around the park! And Disney's fireworks shows (Happily Ever After at Magic Kingdom, Harmonious at EPCOT) are genuinely magical."
+      },
+      "options": [
+        { "value": "fireworks", "label": "Disney fireworks show at Cinderella Castle", "emoji": "🎆" },
+        { "value": "harry-potter", "label": "Wizarding World of Harry Potter", "emoji": "⚡" },
+        { "value": "star-wars", "label": "Star Wars: Galaxy's Edge", "emoji": "⭐" },
+        { "value": "character-meet", "label": "Meet Disney characters (Mickey, princesses, etc.)", "emoji": "🐭" },
+        { "value": "avatar", "label": "Avatar Flight of Passage", "emoji": "🪽" },
+        { "value": "world-showcase", "label": "EPCOT World Showcase (eat around the world!)", "emoji": "🗺️" },
+        { "value": "safari", "label": "Kilimanjaro Safari (real animals!)", "emoji": "🦒" },
+        { "value": "water-rides", "label": "Water rides to cool off", "emoji": "💦" },
+        { "value": "shopping", "label": "Park shopping and souvenirs", "emoji": "🛍️" },
+        { "value": "velocicoaster", "label": "Velocicoaster (Universal's top coaster)", "emoji": "🦖" }
+      ]
+    },
+    {
+      "id": "park-pace-v2",
+      "type": "single-choice",
+      "question": "How do you want to pace your park days?",
+      "knowledgeCard": {
+        "title": "Park Day Pacing",
+        "content": "A full Disney park day means 8-14 hours on your feet and 15,000-25,000 steps! Magic Kingdom alone covers 107 acres. The Florida heat (80-95°F) adds to the challenge. Many experienced families do a 'rope drop and midday break' strategy: arrive at park opening, hit big rides early, go back to the hotel pool from 1-4pm when it's hottest and most crowded, then return for evening shows and shorter lines. It works amazingly well!"
+      },
+      "options": [
+        { "value": "relaxed", "label": "Sleep in, take it easy, no rushing", "emoji": "😴" },
+        { "value": "midday-break", "label": "Early start, pool break midday, return for evening", "emoji": "🏊" },
+        { "value": "steady", "label": "Steady pace all day with sit-down breaks", "emoji": "🚶" },
+        { "value": "power", "label": "Go hard! Maximize every minute in the park", "emoji": "⚡" }
+      ]
+    },
+    {
+      "id": "splitting-comfort",
+      "type": "single-choice",
+      "question": "How do you feel about the group splitting up during park days?",
+      "knowledgeCard": {
+        "title": "Why Splitting Up Works",
+        "content": "With 9+ people, splitting into smaller groups is actually the secret to everyone having a great time! Example: thrill-seekers hit Velocicoaster while others explore Hogsmeade village. Rider Swap at Disney lets parents take turns on rides without re-waiting in line. You can always regroup for meals, fireworks, and must-do moments. The chat in this app makes it easy to coordinate!"
+      },
+      "options": [
+        { "value": "together", "label": "I want to stay with the whole group", "emoji": "👨‍👩‍👧‍👦" },
+        { "value": "flexible", "label": "Happy to split up sometimes, regroup for meals", "emoji": "🤝" },
+        { "value": "independent", "label": "I'd love some free time to explore on my own", "emoji": "🗺️" },
+        { "value": "whatever", "label": "I'm easy — whatever the group decides!", "emoji": "😎" }
+      ]
+    },
+    {
+      "id": "special-interest",
+      "type": "multi-choice",
+      "question": "Any special interests the planners should know about?",
+      "knowledgeCard": {
+        "title": "Hidden Gems for Every Interest",
+        "content": "Photography lovers: Disney PhotoPass photographers are stationed everywhere and included with Memory Maker. History buffs: EPCOT's World Showcase has incredible cultural exhibits. Foodies: Victoria & Albert's at the Grand Floridian is one of Florida's best restaurants. Animal lovers: Animal Kingdom's Gorilla Falls trail and Maharajah Jungle Trek are self-paced walking tours. Thrill seekers: Universal's Hagrid's Motorbike Adventure is consistently rated the world's best theme park ride!"
+      },
+      "options": [
+        { "value": "photography", "label": "Photography — I want amazing photos!", "emoji": "📸" },
+        { "value": "foodie", "label": "I'm a foodie — best restaurants please!", "emoji": "🍽️" },
+        { "value": "animals", "label": "Animals and nature", "emoji": "🐾" },
+        { "value": "history-culture", "label": "History and world cultures", "emoji": "🏛️" },
+        { "value": "rides-only", "label": "Rides, rides, rides!", "emoji": "🎢" },
+        { "value": "shows", "label": "Shows and entertainment", "emoji": "🎭" },
+        { "value": "relaxation", "label": "Pool time and relaxation", "emoji": "🏖️" },
+        { "value": "shopping", "label": "Shopping and collectibles", "emoji": "🎁" }
+      ]
+    }
+  ]
+}

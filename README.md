@@ -54,10 +54,13 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed technical architec
 - Per-event chat
 
 ### Questionnaires
-- 3 content packs: Park Priorities, Food Preferences, Travel Comfort
+- 5 V2 content packs: Park Day Adventures, Dining Dreams, Comfort & Planning, Budget & Style, Magical Moments
 - Engine supports: single choice, multi choice, slider, budget allocation
-- Knowledge cards with informative park tips for first-timers
-- Admin-only results: aggregate dashboards + per-person drilldown
+- Knowledge cards with Disney/Universal tips for first-timers
+- Celebration finish screen with animations
+- Focus mode: BottomNav hides during questionnaire for unobstructed mobile UX
+- Admin-only results: aggregate dashboards, outlier highlights, per-person drilldown
+- Responses persisted to Supabase when connected
 
 ### Budget Tracker
 - Shared expense tracking (all members can add)
@@ -110,6 +113,26 @@ In dev mode, the app works with preset accounts and in-memory state. No Supabase
 
 ### Configuring Supabase (production)
 
+#### Path A: Supabase CLI
+
+```bash
+# 1. Link to your project
+supabase link --project-ref <your-ref>
+
+# 2. Apply migrations
+supabase db push
+
+# 3. Deploy Edge Functions
+supabase functions deploy family_gate
+supabase functions deploy family_login
+supabase functions deploy keepalive
+
+# 4. Set secrets
+supabase secrets set FAMILY_ACCESS_CODE=your-secret-family-code
+```
+
+#### Path B: Supabase Dashboard (SQL Editor)
+
 1. Create a Supabase project at [supabase.com](https://supabase.com)
 
 2. Copy `.env.example` to `.env.local` and fill in your values:
@@ -117,36 +140,62 @@ In dev mode, the app works with preset accounts and in-memory state. No Supabase
 cp .env.example .env.local
 ```
 
-3. Apply database migrations (in order):
-```bash
-# Via Supabase SQL editor or psql
-psql $DATABASE_URL -f supabase/migrations/001_profiles.sql
-psql $DATABASE_URL -f supabase/migrations/002_trips.sql
-psql $DATABASE_URL -f supabase/migrations/003_days_blocks.sql
-psql $DATABASE_URL -f supabase/migrations/004_rsvps_messages.sql
-psql $DATABASE_URL -f supabase/migrations/005_budget.sql
-psql $DATABASE_URL -f supabase/migrations/006_packing.sql
-psql $DATABASE_URL -f supabase/migrations/007_questionnaires.sql
-psql $DATABASE_URL -f supabase/migrations/008_security.sql
+3. Apply database migrations in order via SQL Editor:
+```
+supabase/migrations/001_profiles.sql
+supabase/migrations/002_trips.sql
+supabase/migrations/003_days_blocks.sql
+supabase/migrations/004_rsvps_messages.sql
+supabase/migrations/005_budget.sql
+supabase/migrations/006_packing.sql
+supabase/migrations/007_questionnaires.sql
+supabase/migrations/008_security.sql
 ```
 
-4. Deploy Edge Functions:
+All migrations are idempotent (safe to re-run). Policies use `DROP POLICY IF EXISTS` before `CREATE POLICY`.
+
+4. Deploy Edge Functions via CLI (requires Supabase CLI even with Dashboard path):
 ```bash
 supabase functions deploy family_gate
 supabase functions deploy family_login
 supabase functions deploy keepalive
 ```
+Each function has a `config.toml` setting `verify_jwt = false` (public endpoints with their own auth logic).
 
 5. Set secrets:
 ```bash
 supabase secrets set FAMILY_ACCESS_CODE=your-secret-family-code
 ```
 
-6. Disable signups in Supabase Dashboard > Auth > Settings
+#### Post-Setup Steps
 
-7. Create user accounts using Supabase Admin API or Dashboard:
+6. **Disable signups** in Supabase Dashboard > Auth > Settings
+
+7. **Enable Realtime** on these tables (Database > Replication > Supabase Realtime):
+   - `messages`, `budget_expenses`, `packing_base_items`, `trip_days`, `time_blocks`, `rsvps`, `packing_checks`
+   - Note: DELETE events bypass column filters in Supabase Realtime — the app handles this client-side
+
+8. **Create user accounts** using Supabase Admin API or Dashboard:
    - Email format: `username@wellschaos.family`
    - Insert matching row in `profiles` table
+
+9. **Profile backfill** (if you created auth users before running 001_profiles.sql):
+```sql
+INSERT INTO profiles (id, username, display_name, role, avatar_emoji, color)
+SELECT id, split_part(email, '@', 1), split_part(email, '@', 1), 'user', '🧑', 'purple'
+FROM auth.users
+WHERE id NOT IN (SELECT id FROM profiles);
+```
+
+#### Deploying to Vercel
+
+Set these environment variables in Vercel project settings:
+- `VITE_SUPABASE_URL` — your Supabase project URL
+- `VITE_SUPABASE_ANON_KEY` — your Supabase anon/publishable key
+
+#### Migration Repair
+
+If you hit "policy already exists" errors (e.g. after a partial migration run), all migrations are safe to re-run — they use `DROP POLICY IF EXISTS` before every `CREATE POLICY`.
 
 ### Keepalive (optional)
 
@@ -213,20 +262,25 @@ src/
   App.tsx                           Root wrapper (AuthProvider)
   lib/
     supabaseClient.ts               Supabase client singleton
-    localCache.ts                   IndexedDB cache layer
-    realtimeSync.ts                 Supabase Realtime subscriptions
+    supabaseData.ts                 Full CRUD data layer (typed queries + mutations)
+    localCache.ts                   IndexedDB cache layer (via idb)
+    realtimeSync.ts                 Supabase Realtime subscriptions (trip-scoped)
+  hooks/
+    useTripData.ts                  Hook: assembles Supabase rows into app types
   providers/
-    AuthProvider.tsx                 Auth context
+    AuthProvider.tsx                 Auth context (session, user, profile)
   content/
-    questionnaires/                 Questionnaire content packs (JSON)
+    questionnaires/
+      index.ts                      Exports V2 questionnaire packs
+      v2/                           5 V2 questionnaire JSON files
   components/
     WellsChaosCalendar/             All UI components
 supabase/
-  migrations/                       SQL migrations (001-008)
+  migrations/                       SQL migrations (001-008, all idempotent)
   functions/
-    family_gate/                    Access code verification
-    family_login/                   Login with rate limiting
-    keepalive/                      Health check
+    family_gate/                    Access code verification (config.toml: verify_jwt=false)
+    family_login/                   Login with rate limiting (config.toml: verify_jwt=false)
+    keepalive/                      Health check (config.toml: verify_jwt=false)
 docs/
   ARCHITECTURE.md                   Technical architecture
   CLAUDE_PROGRESS.md                Implementation progress log
