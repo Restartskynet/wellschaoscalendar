@@ -127,8 +127,8 @@ const QuestionnaireEngine = ({ pack, theme, currentUser, existingAnswers, onComp
         </div>
       </div>
 
-      {/* Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 z-40">
+      {/* Navigation — z-50 so it's above everything; safe-area padding for iOS */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 pb-safe z-50" data-testid="questionnaire-nav">
         <div className="max-w-2xl mx-auto flex gap-3">
           <button
             onClick={goPrev}
@@ -140,6 +140,7 @@ const QuestionnaireEngine = ({ pack, theme, currentUser, existingAnswers, onComp
           <button
             onClick={goNext}
             disabled={!hasAnswer}
+            data-testid="questionnaire-next"
             className={`flex-1 py-3 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center justify-center gap-2 ${
               hasAnswer
                 ? `bg-gradient-to-r ${theme.primary} text-white shadow-md hover:shadow-lg`

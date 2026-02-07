@@ -333,7 +333,7 @@ All include knowledge cards with informative park tips.
 
 ---
 
-## Summary — All 10 Slices Complete
+## Summary — Phase 1 Complete (Slices 0-9)
 
 | Slice | Description | Status |
 |-------|-------------|--------|
@@ -348,4 +348,150 @@ All include knowledge cards with informative park tips.
 | 8 | Questionnaires v1 | DONE |
 | 9 | Photos placeholder + docs + README | DONE |
 
-**Final state**: Build passes, 5 tests pass, clean working repo.
+---
+
+# Phase 2 — Wiring + Bug Fixes + Questionnaires V2
+
+---
+
+## SLICE 10 - Phase 2 Recon + Baseline + Migration Idempotency
+
+**Status**: COMPLETE
+
+**Baseline state**:
+- Build: PASS (`npm run build`)
+- Tests: 5/5 PASS (`CI=1 npx vitest run --pool=forks --no-file-parallelism`)
+- Branch: `claude/wire-chaos-calendar-integration-t1g91`
+- `@supabase/supabase-js` confirmed in package.json dependencies
+
+**Known issues identified**:
+1. **Questionnaire "Next" tap blocked on mobile**: QuestionnaireEngine footer has `z-40`, BottomNav has `z-50` — BottomNav sits on top
+2. **Budget modal actions not always reachable**: Modal actions at bottom of scrollable content, no sticky footer
+3. **Supabase wiring gaps**: All features still use in-memory local state (time_blocks, rsvps, messages, budget, packing, questionnaire responses)
+4. **Realtime not scoped**: `realtimeSync.ts` subscribes to all rows globally, no `trip_id` filter
+5. **Migration idempotency**: 41 CREATE POLICY statements lacked DROP POLICY IF EXISTS guards
+
+**Changes**:
+- **All 7 migration files (001-007)**: Added `DROP POLICY IF EXISTS` before every `CREATE POLICY` statement (41 policies total), making all migrations idempotent and safe to re-run with `supabase db push`
+- 008_security.sql was already idempotent (no changes needed)
+
+**How to QA**:
+- Migrations can now be re-applied without "policy already exists" errors
+- `supabase db push` will succeed even if policies already exist on remote
+
+**Build**: PASS | **Tests**: 5/5 PASS
+
+---
+
+## SLICE 11 - Questionnaire Focus Mode + Fix Next Tap (P0)
+
+**Status**: COMPLETE
+
+**Problem**: QuestionnaireEngine footer nav had `z-40`, BottomNav had `z-50`. On mobile, BottomNav sat on top of the Next/Finish buttons, making them untappable.
+
+**Solution**: Option 1 — Focus Mode. Hide BottomNav entirely when a questionnaire is in progress.
+
+**Changes**:
+1. **`WellsChaosCalendar.tsx`**: Added `focusMode` state + `handleFocusModeChange` callback. BottomNav conditionally hidden when `focusMode === true`.
+2. **`MorePage.tsx`**: Added `onFocusModeChange` prop, passed through to QuestionnairesPage.
+3. **`QuestionnairesPage.tsx`**: Added `onFocusModeChange` prop. Uses `useEffect` to notify parent when `activeQuestionnaire` changes. Cleanup returns `false` on unmount.
+4. **`QuestionnaireEngine.tsx`**: Footer nav bumped to `z-50`, added `pb-safe` for iOS safe area, added `data-testid="questionnaire-nav"` and `data-testid="questionnaire-next"`.
+
+**How to QA**:
+- Navigate to More > Questionnaires > tap any questionnaire
+- BottomNav should disappear immediately
+- Next/Finish button should be fully tappable on any mobile screen size
+- Pressing back or completing the questionnaire restores BottomNav
+
+**Build**: PASS | **Tests**: 10/10 PASS (5 new tests added)
+
+---
+
+## SLICE 12 - Budget Modal Mobile UX Fix (P0)
+
+**Status**: COMPLETE
+
+**Problem**: Budget modal's Save/Add buttons were at the bottom of a scrollable div, potentially pushed off-screen on small devices when the form was long.
+
+**Solution**: Restructured modal to use flex column layout with:
+- Sticky header (flex-shrink-0)
+- Scrollable content area (flex-1 overflow-y-auto)
+- Sticky footer with action buttons (flex-shrink-0, always visible)
+
+**Changes**:
+- **`MorePage.tsx`**: Budget form modal restructured from `overflow-y-auto` on entire modal to flex column with separate scrollable content and sticky footer. Added `data-testid="budget-modal"`, `data-testid="budget-modal-actions"`, `data-testid="budget-save"`.
+
+**How to QA**:
+- Navigate to More > Budget > tap the + FAB
+- On a small screen, scroll through the split-with list
+- Cancel and Save/Add Expense buttons should always be visible at the bottom
+- Buttons should be tappable even on the smallest screens
+
+**Build**: PASS | **Tests**: 10/10 PASS
+
+---
+
+## SLICE 13 - Supabase Auth Path Verification + Edge Function Configs
+
+**Status**: COMPLETE
+
+**Changes**:
+- Created `config.toml` for each edge function (`family_gate`, `family_login`, `keepalive`) with `verify_jwt = false`
+- Auth path verified: gate → login → edge function → session → profile hydration → trip load
+- Dev mode continues to work without Supabase
+
+**Build**: PASS | **Tests**: 10/10 PASS
+
+---
+
+## SLICE 14 - Wire Core Data to Supabase
+
+**Status**: COMPLETE
+
+**Files created**:
+1. **`src/lib/supabaseData.ts`**: Full Supabase data layer:
+   - Typed DB row types for all tables
+   - Fetch functions: fetchActiveTrip, fetchTripMembers, fetchTripDays, fetchTimeBlocks, fetchRsvps, fetchMessages, fetchBudgetExpenses, fetchPackingItems, fetchQuestionnaireResponses
+   - Mutation functions: createTrip, addTimeBlock, updateTimeBlock, deleteTimeBlock, upsertRsvp, sendMessage, addBudgetExpense, updateBudgetExpense, deleteBudgetExpense, addPackingBaseItem, deletePackingBaseItem, upsertPackingCheck, saveQuestionnaireResponse
+   - `hydrateTripData()`: parallel fetch of all trip data in one call
+2. **`src/hooks/useTripData.ts`**: Hook to assemble Supabase rows into app Trip type
+
+**Files changed**:
+- **`WellsChaosCalendar.tsx`**: Major rewrite:
+  - Imports Supabase data/mutation functions
+  - `loadSupabaseTrip()`: fetches active trip, hydrates data, sets state
+  - `assembleFromSupabase()`: converts flat Supabase rows → nested Trip type
+  - Supabase-backed mutation callbacks for chat, budget, packing (write-through)
+  - Profile hydration from AuthProvider
+  - Cleanup on logout
+
+**How to QA**:
+- **Without Supabase** (dev mode): app works exactly as before (local state)
+- **With Supabase** (env vars set): login → auto-loads trip → data from DB → mutations write to Supabase
+
+**Build**: PASS | **Tests**: 10/10 PASS
+
+---
+
+## SLICE 15 - Realtime Scoping + Fast-Open Local Cache
+
+**Status**: COMPLETE
+
+**Changes**:
+1. **`src/lib/realtimeSync.ts`**: Rewritten with proper trip scoping:
+   - Tables with `trip_id` (messages, budget_expenses, packing_base_items, trip_days) use filter: `trip_id=eq.<tripId>`
+   - Tables without `trip_id` (time_blocks, rsvps, packing_checks) subscribe to all, RLS gates access
+   - Documented DELETE filtering limitation (DELETE payloads only contain PK columns)
+2. **`WellsChaosCalendar.tsx`**: Integrated cache and realtime:
+   - On login: attempts IndexedDB cache load first (fast-open)
+   - Then hydrates from Supabase (source of truth)
+   - Writes to IndexedDB cache after hydration
+   - Subscribes to realtime changes; on change, refetches full dataset
+   - Cleanup on logout and unmount
+
+**How to QA**:
+- With Supabase: trip data appears quickly (cached), then refreshes from server
+- Changes made by other family members appear in realtime
+- Logout cleans up subscriptions
+
+**Build**: PASS | **Tests**: 10/10 PASS

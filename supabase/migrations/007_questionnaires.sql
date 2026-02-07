@@ -30,23 +30,28 @@ alter table public.questionnaires enable row level security;
 alter table public.questionnaire_responses enable row level security;
 
 -- Questionnaires: members can read active questionnaires for their trip
+drop policy if exists "questionnaires_select" on public.questionnaires;
 create policy "questionnaires_select" on public.questionnaires
   for select using (
     public.is_trip_member(trip_id)
   );
 
 -- Questionnaires: admins can manage
+drop policy if exists "questionnaires_insert" on public.questionnaires;
 create policy "questionnaires_insert" on public.questionnaires
   for insert with check (public.is_trip_admin(trip_id));
 
+drop policy if exists "questionnaires_update" on public.questionnaires;
 create policy "questionnaires_update" on public.questionnaires
   for update using (public.is_trip_admin(trip_id));
 
 -- Responses: members can read their own responses
+drop policy if exists "responses_select_own" on public.questionnaire_responses;
 create policy "responses_select_own" on public.questionnaire_responses
   for select using (auth.uid() = user_id);
 
 -- Responses: admins can read ALL responses (for aggregate dashboards)
+drop policy if exists "responses_select_admin" on public.questionnaire_responses;
 create policy "responses_select_admin" on public.questionnaire_responses
   for select using (
     exists (
@@ -57,9 +62,11 @@ create policy "responses_select_admin" on public.questionnaire_responses
   );
 
 -- Responses: members can insert/update their own
+drop policy if exists "responses_insert" on public.questionnaire_responses;
 create policy "responses_insert" on public.questionnaire_responses
   for insert with check (auth.uid() = user_id);
 
+drop policy if exists "responses_update" on public.questionnaire_responses;
 create policy "responses_update" on public.questionnaire_responses
   for update using (auth.uid() = user_id)
   with check (auth.uid() = user_id);

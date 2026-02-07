@@ -56,17 +56,21 @@ as $$
 $$;
 
 -- Days: members can read
+drop policy if exists "trip_days_select" on public.trip_days;
 create policy "trip_days_select" on public.trip_days
   for select using (public.is_trip_member(trip_id));
 
 -- Days: admins can insert/update
+drop policy if exists "trip_days_insert" on public.trip_days;
 create policy "trip_days_insert" on public.trip_days
   for insert with check (public.is_trip_admin(trip_id));
 
+drop policy if exists "trip_days_update" on public.trip_days;
 create policy "trip_days_update" on public.trip_days
   for update using (public.is_trip_admin(trip_id));
 
 -- Blocks: members can read
+drop policy if exists "time_blocks_select" on public.time_blocks;
 create policy "time_blocks_select" on public.time_blocks
   for select using (
     exists (
@@ -77,6 +81,7 @@ create policy "time_blocks_select" on public.time_blocks
   );
 
 -- Blocks: admins can insert/update/delete
+drop policy if exists "time_blocks_insert" on public.time_blocks;
 create policy "time_blocks_insert" on public.time_blocks
   for insert with check (
     exists (
@@ -86,6 +91,7 @@ create policy "time_blocks_insert" on public.time_blocks
     )
   );
 
+drop policy if exists "time_blocks_update" on public.time_blocks;
 create policy "time_blocks_update" on public.time_blocks
   for update using (
     exists (
@@ -95,6 +101,7 @@ create policy "time_blocks_update" on public.time_blocks
     )
   );
 
+drop policy if exists "time_blocks_delete" on public.time_blocks;
 create policy "time_blocks_delete" on public.time_blocks
   for delete using (
     exists (

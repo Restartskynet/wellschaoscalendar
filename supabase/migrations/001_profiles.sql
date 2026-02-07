@@ -18,10 +18,12 @@ create table if not exists public.profiles (
 alter table public.profiles enable row level security;
 
 -- Everyone authenticated can read all profiles (family app)
+drop policy if exists "profiles_select" on public.profiles;
 create policy "profiles_select" on public.profiles
   for select using (auth.role() = 'authenticated');
 
 -- Users can update only their own profile (avatar, theme, color)
+drop policy if exists "profiles_update_own" on public.profiles;
 create policy "profiles_update_own" on public.profiles
   for update using (auth.uid() = id)
   with check (auth.uid() = id);

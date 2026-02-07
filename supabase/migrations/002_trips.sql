@@ -24,6 +24,7 @@ alter table public.trips enable row level security;
 alter table public.trip_members enable row level security;
 
 -- Members can read their trips
+drop policy if exists "trips_select" on public.trips;
 create policy "trips_select" on public.trips
   for select using (
     exists (
@@ -34,6 +35,7 @@ create policy "trips_select" on public.trips
   );
 
 -- Admins can update trip details
+drop policy if exists "trips_update" on public.trips;
 create policy "trips_update" on public.trips
   for update using (
     exists (
@@ -45,10 +47,12 @@ create policy "trips_update" on public.trips
   );
 
 -- Admins can create trips
+drop policy if exists "trips_insert" on public.trips;
 create policy "trips_insert" on public.trips
   for insert with check (auth.uid() = created_by);
 
 -- Trip members: members can read membership
+drop policy if exists "trip_members_select" on public.trip_members;
 create policy "trip_members_select" on public.trip_members
   for select using (
     exists (
@@ -59,6 +63,7 @@ create policy "trip_members_select" on public.trip_members
   );
 
 -- Only admins can manage membership
+drop policy if exists "trip_members_insert" on public.trip_members;
 create policy "trip_members_insert" on public.trip_members
   for insert with check (
     exists (

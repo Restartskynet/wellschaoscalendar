@@ -28,6 +28,7 @@ alter table public.rsvps enable row level security;
 alter table public.messages enable row level security;
 
 -- RSVPs: members can read all RSVPs for blocks in their trip
+drop policy if exists "rsvps_select" on public.rsvps;
 create policy "rsvps_select" on public.rsvps
   for select using (
     exists (
@@ -39,14 +40,17 @@ create policy "rsvps_select" on public.rsvps
   );
 
 -- RSVPs: members can insert/update their own RSVP only
+drop policy if exists "rsvps_insert" on public.rsvps;
 create policy "rsvps_insert" on public.rsvps
   for insert with check (auth.uid() = user_id);
 
+drop policy if exists "rsvps_update" on public.rsvps;
 create policy "rsvps_update" on public.rsvps
   for update using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
 -- Messages: members can read messages in their trip
+drop policy if exists "messages_select" on public.messages;
 create policy "messages_select" on public.messages
   for select using (
     -- Trip chat
@@ -62,6 +66,7 @@ create policy "messages_select" on public.messages
   );
 
 -- Messages: members can insert messages (append-only)
+drop policy if exists "messages_insert" on public.messages;
 create policy "messages_insert" on public.messages
   for insert with check (
     auth.uid() = user_id

@@ -12,6 +12,7 @@ type MorePageProps = {
   budgetItems: BudgetItem[];
   onUpdatePackingList: (items: PackingItem[]) => void;
   onUpdateBudgetItems: (items: BudgetItem[]) => void;
+  onFocusModeChange?: (active: boolean) => void;
 };
 
 type TabType = 'packing' | 'budget' | 'questionnaires';
@@ -24,7 +25,8 @@ const MorePage = ({
   packingList,
   budgetItems,
   onUpdatePackingList,
-  onUpdateBudgetItems
+  onUpdateBudgetItems,
+  onFocusModeChange
 }: MorePageProps) => {
   const [activeTab, setActiveTab] = useState<TabType>('packing');
   const [newPackingItem, setNewPackingItem] = useState('');
@@ -439,7 +441,7 @@ const MorePage = ({
         )}
         {/* Questionnaires */}
         {activeTab === 'questionnaires' && (
-          <QuestionnairesPage currentUser={currentUser} accounts={accounts} theme={theme} />
+          <QuestionnairesPage currentUser={currentUser} accounts={accounts} theme={theme} onFocusModeChange={onFocusModeChange} />
         )}
       </div>
 
@@ -456,9 +458,10 @@ const MorePage = ({
 
       {/* Budget Form Modal */}
       {showBudgetForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center">
-          <div className="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl animate-slide-up max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white px-4 py-4 border-b border-gray-100 rounded-t-3xl">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center" data-testid="budget-modal">
+          <div className="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl animate-slide-up max-h-[90vh] flex flex-col">
+            {/* Sticky header */}
+            <div className="flex-shrink-0 bg-white px-4 py-4 border-b border-gray-100 rounded-t-3xl">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-gray-800">
                   {editingBudgetItem ? 'Edit Expense' : 'Add Expense'}
@@ -472,7 +475,8 @@ const MorePage = ({
               </div>
             </div>
 
-            <div className="p-4 space-y-4">
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
@@ -569,9 +573,11 @@ const MorePage = ({
                   </div>
                 </div>
               )}
+            </div>
 
-              {/* Actions */}
-              <div className="flex gap-3 pt-2">
+            {/* Sticky footer actions — always visible on small screens */}
+            <div className="flex-shrink-0 bg-white border-t border-gray-100 p-4 pb-safe rounded-b-3xl" data-testid="budget-modal-actions">
+              <div className="flex gap-3">
                 <button
                   onClick={resetBudgetForm}
                   className="flex-1 py-3 rounded-xl font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
@@ -581,6 +587,7 @@ const MorePage = ({
                 <button
                   onClick={handleSaveBudgetItem}
                   disabled={!budgetForm.description.trim() || !budgetForm.amount || budgetForm.splitWith.length === 0}
+                  data-testid="budget-save"
                   className={`flex-1 py-3 rounded-xl font-semibold text-white transition-all duration-200 ${
                     budgetForm.description.trim() && budgetForm.amount && budgetForm.splitWith.length > 0
                       ? `bg-gradient-to-r ${theme.primary} shadow-md hover:shadow-lg`

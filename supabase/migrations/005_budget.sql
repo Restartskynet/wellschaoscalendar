@@ -16,10 +16,12 @@ create table if not exists public.budget_expenses (
 alter table public.budget_expenses enable row level security;
 
 -- Members can read expenses for their trip
+drop policy if exists "budget_select" on public.budget_expenses;
 create policy "budget_select" on public.budget_expenses
   for select using (public.is_trip_member(trip_id));
 
 -- Members can add expenses
+drop policy if exists "budget_insert" on public.budget_expenses;
 create policy "budget_insert" on public.budget_expenses
   for insert with check (
     auth.uid() = created_by
@@ -27,11 +29,13 @@ create policy "budget_insert" on public.budget_expenses
   );
 
 -- Admins can update/delete any expense; members can update their own
+drop policy if exists "budget_update" on public.budget_expenses;
 create policy "budget_update" on public.budget_expenses
   for update using (
     public.is_trip_admin(trip_id) or auth.uid() = created_by
   );
 
+drop policy if exists "budget_delete" on public.budget_expenses;
 create policy "budget_delete" on public.budget_expenses
   for delete using (
     public.is_trip_admin(trip_id) or auth.uid() = created_by
