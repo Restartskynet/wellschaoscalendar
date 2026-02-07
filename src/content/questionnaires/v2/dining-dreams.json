@@ -1,0 +1,90 @@
+{
+  "slug": "dining-dreams-v2",
+  "title": "Dining Dreams",
+  "description": "From character breakfasts to world-class cuisine — tell us how you want to eat!",
+  "emoji": "🍽️",
+  "questions": [
+    {
+      "id": "dining-style-v2",
+      "type": "single-choice",
+      "question": "What's your ideal park dining style?",
+      "knowledgeCard": {
+        "title": "Dining at Disney & Universal",
+        "content": "Quick Service (counter order, $10-18/meal) is fast and surprisingly good — try the Flame Tree BBQ at Animal Kingdom or Docking Bay 7 in Galaxy's Edge! Table Service ($25-60/person) is sit-down with a waiter — Sci-Fi Dine-In at Hollywood Studios is like eating in a drive-in movie theater! Signature Dining ($60-100+) includes places like Be Our Guest (inside Beast's Castle!) and Mythos at Universal (voted best theme park restaurant). Many families mix all three!"
+      },
+      "options": [
+        { "value": "quick-service", "label": "Quick service mostly — keep it fast and affordable", "emoji": "🍔" },
+        { "value": "mix", "label": "A mix — some quick, some sit-down", "emoji": "🍕" },
+        { "value": "table-service", "label": "I want sit-down restaurant experiences!", "emoji": "🍝" },
+        { "value": "treat-yourself", "label": "Treat yourself! Signature dining, fancy stuff", "emoji": "✨" }
+      ]
+    },
+    {
+      "id": "character-dining",
+      "type": "single-choice",
+      "question": "How about Character Dining? (Eat with Disney characters!)",
+      "knowledgeCard": {
+        "title": "Character Dining Explained",
+        "content": "Character meals are restaurants where Disney characters walk around to your table for photos and autographs while you eat! Popular ones: Chef Mickey's (Mickey & friends, breakfast/dinner), Cinderella's Royal Table (inside the castle!), 'Ohana (Lilo & Stitch breakfast at Polynesian Resort), Tusker House (Donald's Safari Breakfast). They cost $35-60/person but include amazing food AND the character experience. They book up 60 days out, so let Ben & Marie know soon if you want one!"
+      },
+      "options": [
+        { "value": "must-do", "label": "YES! I need to eat with Mickey!", "emoji": "🐭" },
+        { "value": "sounds-fun", "label": "Sounds fun — I'd try one!", "emoji": "😊" },
+        { "value": "not-for-me", "label": "Not really my thing, but I'll go if others want to", "emoji": "🤷" },
+        { "value": "skip", "label": "I'd rather skip and do more rides", "emoji": "🎢" }
+      ]
+    },
+    {
+      "id": "dietary-needs-v2",
+      "type": "multi-choice",
+      "question": "Any dietary needs or preferences?",
+      "knowledgeCard": {
+        "title": "Disney Handles Dietary Needs Like Champs",
+        "content": "Disney is incredibly accommodating with dietary needs! Every quick-service and table-service location can handle allergies — just tell the cast member. Many menus are already labeled with allergy info. Vegan options have exploded recently (the Ronto Wrap in Galaxy's Edge is amazing!). Kosher, halal, and gluten-free options are available park-wide. If you have severe allergies, Disney chefs will personally come out to discuss your meal. Universal is similarly accommodating."
+      },
+      "options": [
+        { "value": "none", "label": "No restrictions — I eat everything!", "emoji": "😋" },
+        { "value": "vegetarian", "label": "Vegetarian", "emoji": "🥗" },
+        { "value": "vegan", "label": "Vegan", "emoji": "🌱" },
+        { "value": "gluten-free", "label": "Gluten-free", "emoji": "🌾" },
+        { "value": "dairy-free", "label": "Dairy-free", "emoji": "🥛" },
+        { "value": "nut-allergy", "label": "Nut allergy", "emoji": "🥜" },
+        { "value": "picky", "label": "I'm a picky eater (and that's OK!)", "emoji": "😅" },
+        { "value": "other", "label": "Other (tell Ben & Marie separately)", "emoji": "📝" }
+      ]
+    },
+    {
+      "id": "food-bucket-list",
+      "type": "multi-choice",
+      "question": "Which food experiences sound amazing to you?",
+      "knowledgeCard": {
+        "title": "Iconic Park Foods You'll See Everywhere",
+        "content": "Turkey legs at Magic Kingdom are a legendary photo op (and genuinely delicious). Dole Whip (pineapple soft serve at Aloha Isle) is addictive. School Bread at Norway in EPCOT is a hidden gem. Butterbeer at Wizarding World comes in frozen, cold, and hot versions! At EPCOT's World Showcase, you can literally eat your way around the world — fish & chips in the UK, crepes in France, sushi in Japan. The EPCOT Food & Wine Festival (fall) is peak foodie energy."
+      },
+      "options": [
+        { "value": "dole-whip", "label": "Dole Whip (Disney's famous pineapple treat)", "emoji": "🍦" },
+        { "value": "butterbeer", "label": "Butterbeer at Wizarding World", "emoji": "🍺" },
+        { "value": "turkey-leg", "label": "Giant turkey leg (the classic!)", "emoji": "🍗" },
+        { "value": "world-showcase", "label": "Eating around EPCOT's World Showcase", "emoji": "🌎" },
+        { "value": "galaxy-edge-food", "label": "Star Wars themed food at Galaxy's Edge", "emoji": "⭐" },
+        { "value": "fancy-dinner", "label": "A fancy sit-down dinner somewhere special", "emoji": "🕯️" },
+        { "value": "snack-crawl", "label": "Snack crawl — try a little of everything!", "emoji": "🧁" },
+        { "value": "park-treats", "label": "Mickey pretzels, churros, popcorn", "emoji": "🥨" }
+      ]
+    },
+    {
+      "id": "daily-food-budget",
+      "type": "slider",
+      "question": "What's your comfortable daily food budget per person?",
+      "knowledgeCard": {
+        "title": "Realistic Food Budget Guide",
+        "content": "Budget-friendly ($40-60/day): Quick service meals + snacks. Bring refillable water bottles! Moderate ($60-90/day): 1 quick service, 1 table service, plus snacks and treats. Splurge ($90-150/day): Table service meals, signature dining, all the specialty snacks you want. Money-saving tip: Pack breakfast from the grocery store, eat a big lunch (lunch menus are cheaper than dinner!), and snack in the evening. Also, kids' meals at quick service are an amazing deal!"
+      },
+      "min": 30,
+      "max": 150,
+      "step": 10,
+      "unit": "$",
+      "labels": { "min": "$30 (budget)", "max": "$150+ (splurge)" }
+    }
+  ]
+}

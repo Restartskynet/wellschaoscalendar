@@ -1,0 +1,85 @@
+{
+  "slug": "magical-moments-v2",
+  "title": "Magical Moments",
+  "description": "The special touches that make a Disney trip unforgettable! What matters most to you?",
+  "emoji": "✨",
+  "questions": [
+    {
+      "id": "trip-vibe",
+      "type": "single-choice",
+      "question": "What's the #1 feeling you want from this trip?",
+      "knowledgeCard": {
+        "title": "Making Memories That Last",
+        "content": "Every great Disney trip is built around the 'magic moments' — the first time you see Cinderella Castle, your kid's face meeting their favorite character, riding a coaster with your family and screaming together, watching fireworks and feeling genuinely moved. The parks are designed to create these moments at every turn. Whether you're 5 or 65, first-timer or veteran, there's something that will hit different. This questionnaire helps Ben & Marie build a trip that gives YOU those moments."
+      },
+      "options": [
+        { "value": "adventure", "label": "Adventure and excitement — non-stop action!", "emoji": "🎢" },
+        { "value": "wonder", "label": "Wonder and magic — I want to feel like a kid", "emoji": "✨" },
+        { "value": "togetherness", "label": "Quality family time — being together is what matters", "emoji": "❤️" },
+        { "value": "relaxation", "label": "Relaxation — this is my vacation!", "emoji": "🌴" },
+        { "value": "discovery", "label": "Discovery — I want to explore everything", "emoji": "🔭" }
+      ]
+    },
+    {
+      "id": "disney-knowledge",
+      "type": "single-choice",
+      "question": "How much do you know about Disney/Universal parks?",
+      "knowledgeCard": {
+        "title": "First-Timers Welcome!",
+        "content": "If you've never been, you're in for a treat! The level of detail in these parks is mind-blowing — from the smell of fresh cookies piped onto Main Street USA, to the water stains on the walls of Pirates of the Caribbean, to the floating mountains of Pandora. Universal's Wizarding World will make you feel like you've actually stepped into Hogwarts. Don't worry about knowing everything — that's what Ben & Marie are for! Just be ready to be amazed."
+      },
+      "options": [
+        { "value": "newbie", "label": "Total newbie — I know almost nothing!", "emoji": "🐣" },
+        { "value": "basic", "label": "I know the basics — Mickey, castles, that stuff", "emoji": "🐭" },
+        { "value": "fan", "label": "I'm a Disney fan — seen the movies, know some rides", "emoji": "🏰" },
+        { "value": "expert", "label": "I'm a theme park nerd — let's get strategic!", "emoji": "🧠" }
+      ]
+    },
+    {
+      "id": "best-day-type",
+      "type": "single-choice",
+      "question": "What would your perfect non-park day look like?",
+      "knowledgeCard": {
+        "title": "Beyond the Parks",
+        "content": "Disney World is SO much more than the 4 theme parks! Disney Springs is a massive outdoor shopping/dining/entertainment complex (free entry!). The resort pools are incredible — some have waterslides and lazy rivers. You can rent boats, go fishing, play mini golf, or visit the spa. Universal's CityWalk has amazing restaurants, a movie theater, and live music. There are also 2 water parks (Typhoon Lagoon and Blizzard Beach at Disney, Volcano Bay at Universal). Rest days between parks make the trip SO much better."
+      },
+      "options": [
+        { "value": "pool-day", "label": "Pool day! Lazy river, slides, relaxing", "emoji": "🏊" },
+        { "value": "disney-springs", "label": "Disney Springs shopping & dining", "emoji": "🛍️" },
+        { "value": "water-park", "label": "Water park (Typhoon Lagoon/Blizzard Beach)", "emoji": "🌊" },
+        { "value": "resort-hop", "label": "Resort hopping — see the fancy hotels!", "emoji": "🏨" },
+        { "value": "another-park", "label": "Another park day! No days off!", "emoji": "💥" }
+      ]
+    },
+    {
+      "id": "countdown-excitement",
+      "type": "slider",
+      "question": "On a scale of 1-10, how excited are you right now?!",
+      "knowledgeCard": {
+        "title": "The Disney Countdown Is Part of the Fun!",
+        "content": "Studies actually show that anticipation of a vacation can be just as enjoyable as the vacation itself! Some families make countdown calendars, watch Disney movies together, or research rides on YouTube. Fun tip: watch ride POV videos on YouTube to preview what you're getting into (search 'Hagrid's Motorbike Adventure POV' or 'Guardians Cosmic Rewind POV'). Warning: the Velocicoaster POV might change your thrill level answer from earlier! 😄"
+      },
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "",
+      "labels": { "min": "1 (chill)", "max": "10 (CANNOT WAIT!!!)" }
+    },
+    {
+      "id": "anything-else",
+      "type": "single-choice",
+      "question": "Last one — anything else the trip planners should know?",
+      "knowledgeCard": {
+        "title": "Your Voice Matters!",
+        "content": "Planning a trip for 9+ people is like conducting an orchestra — Ben & Marie want every instrument to shine! If there's something specific you're dreaming about (a certain character, a specific restaurant, an experience you saw online), tell them! The more they know, the more magical they can make it. This app will help coordinate everything — schedules, RSVPs, packing lists, and real-time chat so nobody gets lost. Let's make this the best family trip ever!"
+      },
+      "options": [
+        { "value": "all-good", "label": "I'm all good — plan away!", "emoji": "👍" },
+        { "value": "nervous", "label": "I'm a little nervous about crowds/logistics", "emoji": "😬" },
+        { "value": "specific-wish", "label": "I have a specific wish (I'll message Ben/Marie)", "emoji": "🌠" },
+        { "value": "flexible", "label": "I'm super flexible — surprise me!", "emoji": "🎉" },
+        { "value": "first-time-anxiety", "label": "First-time jitters but SO excited!", "emoji": "🦋" }
+      ]
+    }
+  ]
+}

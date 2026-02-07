@@ -1,0 +1,100 @@
+{
+  "slug": "comfort-planning-v2",
+  "title": "Comfort & Planning",
+  "description": "Help us plan around YOUR comfort level — sleep, heat, walking, and energy!",
+  "emoji": "☀️",
+  "questions": [
+    {
+      "id": "wake-time-v2",
+      "type": "single-choice",
+      "question": "What time are you willing to wake up for park days?",
+      "knowledgeCard": {
+        "title": "Why Early Mornings Matter at Disney",
+        "content": "Disney parks typically open at 9am, but resort guests get Early Entry at 8:30am (sometimes 7:30am!). The first 2 hours have the shortest lines of the entire day — you can ride 4-5 attractions in the time it takes to ride 1 later. But here's the thing: this is vacation! If you're not a morning person, sleeping in and arriving at 11am is totally valid. The parks are open until 9-11pm, so evening crowds thin out too. We'll plan around what works for YOU."
+      },
+      "options": [
+        { "value": "rope-drop", "label": "6:30-7am — I want to be first in line!", "emoji": "🌅" },
+        { "value": "early", "label": "7:30-8:30am — Early but not crazy early", "emoji": "☀️" },
+        { "value": "normal", "label": "9-10am — A normal morning, thanks", "emoji": "🕘" },
+        { "value": "sleep-in", "label": "After 10am — I'm on vacation!", "emoji": "😴" }
+      ]
+    },
+    {
+      "id": "heat-tolerance",
+      "type": "single-choice",
+      "question": "How do you handle heat and humidity?",
+      "knowledgeCard": {
+        "title": "Florida Heat: What to Expect",
+        "content": "Florida in summer averages 90-95°F with 80-90% humidity — it feels like walking through warm soup! Even spring/fall can hit 85°F. Essential survival tips: drink water constantly (refill stations are everywhere), wear moisture-wicking clothes, use cooling towels, take indoor ride breaks. Almost every ride queue and restaurant is air-conditioned. Afternoon thunderstorms (2-4pm) actually cool things down and usually pass in 30 minutes. The parks have free water cups at any quick-service restaurant!"
+      },
+      "options": [
+        { "value": "love-it", "label": "I love warm weather — bring it on!", "emoji": "🔥" },
+        { "value": "fine", "label": "I'll be fine with sunscreen and water", "emoji": "🧴" },
+        { "value": "careful", "label": "I need to be careful — shade breaks essential", "emoji": "⛱️" },
+        { "value": "struggle", "label": "Heat is tough for me — plan lots of indoor time", "emoji": "❄️" }
+      ]
+    },
+    {
+      "id": "walking-stamina",
+      "type": "slider",
+      "question": "How many miles can you comfortably walk in a day?",
+      "knowledgeCard": {
+        "title": "How Much Walking Are We Talking?",
+        "content": "A typical Disney park day = 8-12 miles of walking! Magic Kingdom alone is 107 acres. Good news: you can rent ECVs (motorized scooters, ~$50/day) or wheelchairs ($12/day) at every park entrance. Comfortable walking shoes are the #1 most important thing to pack. Many families alternate 'big park days' (lots of walking) with 'easy days' (pool, Disney Springs shopping, resort hopping). Your feet will thank you for breaking in your shoes BEFORE the trip!"
+      },
+      "min": 2,
+      "max": 15,
+      "step": 1,
+      "unit": "miles",
+      "labels": { "min": "2 miles (easy)", "max": "15+ miles (marathon)" }
+    },
+    {
+      "id": "midday-preference",
+      "type": "single-choice",
+      "question": "What sounds best for the hot midday hours (1-4pm)?",
+      "knowledgeCard": {
+        "title": "The Midday Break Strategy",
+        "content": "Between 1-4pm, parks hit peak heat AND peak crowds. Experienced Disney families swear by the 'midday break': head back to the hotel, swim, nap, recharge, then return for the evening when it's cooler and lines are shorter. Disney transportation (buses, monorail, Skyliner) makes this easy. If you'd rather stay, indoor rides (Haunted Mansion, Pirates, Little Mermaid) and air-conditioned shows (Festival of the Lion King, Indiana Jones Stunt Show) are perfect escapes."
+      },
+      "options": [
+        { "value": "pool-break", "label": "Hotel pool break — nap, swim, recharge!", "emoji": "🏊" },
+        { "value": "indoor-rides", "label": "Stay in the park — hit indoor/air-conditioned rides", "emoji": "🎡" },
+        { "value": "sit-down-lunch", "label": "Long relaxing sit-down lunch in the park", "emoji": "🍽️" },
+        { "value": "power-through", "label": "Keep going! I'll sleep when I'm home", "emoji": "💪" }
+      ]
+    },
+    {
+      "id": "evening-energy",
+      "type": "single-choice",
+      "question": "How late can you go on park days?",
+      "knowledgeCard": {
+        "title": "Evening Magic",
+        "content": "Disney parks stay open until 9-11pm! The evenings are magical: cooler weather, shorter lines, beautiful lighting, and the nighttime shows. Magic Kingdom's fireworks (Happily Ever After) happen around 9pm and are unforgettable. EPCOT's Harmonious show lights up the lagoon. Universal often has later hours too. But be honest with yourself — if you've been going since 7am, it's OK to call it a day at 7pm. There's no shame in the early bedtime game!"
+      },
+      "options": [
+        { "value": "early-out", "label": "I'll be done by 6-7pm", "emoji": "🌅" },
+        { "value": "fireworks", "label": "Stay for fireworks (~9pm), then head out", "emoji": "🎆" },
+        { "value": "late-night", "label": "Park closing! 10-11pm, let's go!", "emoji": "🌙" },
+        { "value": "depends", "label": "Depends on how I'm feeling that day", "emoji": "🤔" }
+      ]
+    },
+    {
+      "id": "accessibility-needs",
+      "type": "multi-choice",
+      "question": "Any accessibility or comfort needs we should plan for?",
+      "knowledgeCard": {
+        "title": "Disney's Accessibility Is World-Class",
+        "content": "Disney goes above and beyond for accessibility. DAS (Disability Access Service) provides a virtual queue for guests who can't wait in traditional lines. Wheelchair and ECV rentals are available at every park. Most rides accommodate wheelchairs, and cast members are trained to help. Sensory guides are available for guests with autism or sensory sensitivities. Companion restrooms are throughout the parks. Service animals are welcome. Let Ben & Marie know your needs so they can plan the smoothest trip possible!"
+      },
+      "options": [
+        { "value": "none", "label": "No special needs — I'm good!", "emoji": "👍" },
+        { "value": "mobility", "label": "Mobility assistance (wheelchair/scooter)", "emoji": "♿" },
+        { "value": "frequent-breaks", "label": "Need frequent rest breaks", "emoji": "🪑" },
+        { "value": "sensory", "label": "Sensory sensitivities (noise, crowds)", "emoji": "🎧" },
+        { "value": "dietary-medical", "label": "Medical/dietary needs (carrying meds, etc.)", "emoji": "💊" },
+        { "value": "fear-heights", "label": "Afraid of heights or enclosed spaces", "emoji": "😰" },
+        { "value": "small-children", "label": "Traveling with small children", "emoji": "👶" }
+      ]
+    }
+  ]
+}

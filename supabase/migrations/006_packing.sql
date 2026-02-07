@@ -36,20 +36,25 @@ alter table public.packing_checks enable row level security;
 alter table public.personal_packing_items enable row level security;
 
 -- Base items: members can read
+drop policy if exists "packing_base_select" on public.packing_base_items;
 create policy "packing_base_select" on public.packing_base_items
   for select using (public.is_trip_member(trip_id));
 
 -- Base items: admins can manage
+drop policy if exists "packing_base_insert" on public.packing_base_items;
 create policy "packing_base_insert" on public.packing_base_items
   for insert with check (public.is_trip_admin(trip_id));
 
+drop policy if exists "packing_base_update" on public.packing_base_items;
 create policy "packing_base_update" on public.packing_base_items
   for update using (public.is_trip_admin(trip_id));
 
+drop policy if exists "packing_base_delete" on public.packing_base_items;
 create policy "packing_base_delete" on public.packing_base_items
   for delete using (public.is_trip_admin(trip_id));
 
 -- Checks: members can read all checks for their trip's items
+drop policy if exists "packing_checks_select" on public.packing_checks;
 create policy "packing_checks_select" on public.packing_checks
   for select using (
     exists (
@@ -60,21 +65,27 @@ create policy "packing_checks_select" on public.packing_checks
   );
 
 -- Checks: users can manage their own checks
+drop policy if exists "packing_checks_insert" on public.packing_checks;
 create policy "packing_checks_insert" on public.packing_checks
   for insert with check (auth.uid() = user_id);
 
+drop policy if exists "packing_checks_update" on public.packing_checks;
 create policy "packing_checks_update" on public.packing_checks
   for update using (auth.uid() = user_id);
 
 -- Personal items: users can only see/manage their own
+drop policy if exists "personal_packing_select" on public.personal_packing_items;
 create policy "personal_packing_select" on public.personal_packing_items
   for select using (auth.uid() = user_id);
 
+drop policy if exists "personal_packing_insert" on public.personal_packing_items;
 create policy "personal_packing_insert" on public.personal_packing_items
   for insert with check (auth.uid() = user_id and public.is_trip_member(trip_id));
 
+drop policy if exists "personal_packing_update" on public.personal_packing_items;
 create policy "personal_packing_update" on public.personal_packing_items
   for update using (auth.uid() = user_id);
 
+drop policy if exists "personal_packing_delete" on public.personal_packing_items;
 create policy "personal_packing_delete" on public.personal_packing_items
   for delete using (auth.uid() = user_id);

@@ -46,23 +46,43 @@ const QuestionnaireEngine = ({ pack, theme, currentUser, existingAnswers, onComp
     onComplete(answers);
   };
 
-  // Completion screen
+  // Completion screen with celebration
   if (isComplete) {
+    const celebrationEmojis = ['🎉', '✨', '🏰', '🎢', '🌟', '🎆', '🧙', '🦋'];
     return (
-      <div className={`min-h-screen bg-gradient-to-br ${theme.bg} flex items-center justify-center p-4`}>
-        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center animate-fade-in">
+      <div className={`min-h-screen bg-gradient-to-br ${theme.bg} flex items-center justify-center p-4 overflow-hidden relative`}>
+        {/* Floating celebration emojis */}
+        {celebrationEmojis.map((emoji, i) => (
+          <div
+            key={i}
+            className="absolute text-3xl animate-bounce pointer-events-none"
+            style={{
+              left: `${10 + (i * 12) % 80}%`,
+              top: `${15 + (i * 17) % 60}%`,
+              animationDelay: `${i * 0.2}s`,
+              animationDuration: `${1.5 + (i % 3) * 0.5}s`,
+              opacity: 0.6,
+            }}
+          >
+            {emoji}
+          </div>
+        ))}
+        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center animate-fade-in relative z-10">
           <div className="text-6xl mb-4">
             <Sparkles size={48} className="mx-auto text-yellow-500 animate-pulse" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">All done!</h2>
-          <p className="text-gray-500 mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">You're all set! 🎉</h2>
+          <p className="text-gray-500 mb-2">
             Thanks, {currentUser.name}! Your answers will help make this trip amazing.
+          </p>
+          <p className="text-sm text-purple-600 font-medium mb-6">
+            {pack.questions.length} questions answered — you're a planning superstar!
           </p>
           <button
             onClick={handleFinish}
-            className={`w-full py-4 rounded-xl font-semibold text-lg text-white bg-gradient-to-r ${theme.primary} shadow-lg hover:shadow-xl transition-all`}
+            className={`w-full py-4 rounded-xl font-semibold text-lg text-white bg-gradient-to-r ${theme.primary} shadow-lg hover:shadow-xl transition-all transform hover:scale-105`}
           >
-            Save & Return
+            Save & Return ✨
           </button>
         </div>
       </div>
@@ -94,8 +114,8 @@ const QuestionnaireEngine = ({ pack, theme, currentUser, existingAnswers, onComp
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-6">
-        {/* Question */}
-        <div className="animate-fade-in">
+        {/* Question — key triggers animation on question change */}
+        <div key={question.id} className="animate-fade-in">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-800 mb-2">{question.question}</h2>
             {question.knowledgeCard && (
@@ -127,8 +147,8 @@ const QuestionnaireEngine = ({ pack, theme, currentUser, existingAnswers, onComp
         </div>
       </div>
 
-      {/* Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 z-40">
+      {/* Navigation — z-50 so it's above everything; safe-area padding for iOS */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 pb-safe z-50" data-testid="questionnaire-nav">
         <div className="max-w-2xl mx-auto flex gap-3">
           <button
             onClick={goPrev}
@@ -140,6 +160,7 @@ const QuestionnaireEngine = ({ pack, theme, currentUser, existingAnswers, onComp
           <button
             onClick={goNext}
             disabled={!hasAnswer}
+            data-testid="questionnaire-next"
             className={`flex-1 py-3 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center justify-center gap-2 ${
               hasAnswer
                 ? `bg-gradient-to-r ${theme.primary} text-white shadow-md hover:shadow-lg`
