@@ -63,6 +63,12 @@ export type PackingItem = {
   addedBy: string;
 };
 
+export type PersonalPackingItem = {
+  id: string;
+  item: string;
+  packed: boolean;
+};
+
 export type BudgetItem = {
   id: string;
   description: string;

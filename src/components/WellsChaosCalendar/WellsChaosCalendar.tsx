@@ -3,10 +3,10 @@ import { PRESET_ACCOUNTS } from '../../data/accounts';
 import { THEMES } from '../../data/themes';
 import { useAuth } from '../../providers/AuthProvider';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
-import { hydrateTripData, fetchActiveTrip, sendMessage as sbSendMessage, addBudgetExpense, updateBudgetExpense, deleteBudgetExpense, addPackingBaseItem, deletePackingBaseItem, upsertPackingCheck, type HydratedTripData, type DbProfile } from '../../lib/supabaseData';
+import { hydrateTripData, fetchActiveTrip, sendMessage as sbSendMessage, addBudgetExpense, updateBudgetExpense, deleteBudgetExpense, addPackingBaseItem, deletePackingBaseItem, upsertPackingCheck, createPersonalPackingItem, togglePersonalPackingItem, deletePersonalPackingItem, type HydratedTripData, type DbProfile } from '../../lib/supabaseData';
 import { subscribeToTrip, unsubscribeAll } from '../../lib/realtimeSync';
 import { cacheTripData, getCachedTripData } from '../../lib/localCache';
-import type { Account, BudgetItem, ChatMessage, EventTheme, PackingItem, Trip } from '../../types/wellsChaos';
+import type { Account, BudgetItem, ChatMessage, EventTheme, PackingItem, PersonalPackingItem, Trip } from '../../types/wellsChaos';
 import type { ThemeKey } from '../../data/themes';
 import AccountSwitcher from './AccountSwitcher';
 import AnimationStyles from './AnimationStyles';
@@ -57,12 +57,13 @@ function profileToAccount(profile: DbProfile): Account {
   };
 }
 
-function assembleFromSupabase(data: HydratedTripData): {
+function assembleFromSupabase(data: HydratedTripData, currentUserId?: string): {
   trip: Trip;
   accounts: Account[];
   chatMessages: ChatMessage[];
   budgetItems: BudgetItem[];
   packingList: PackingItem[];
+  personalPackingItems: PersonalPackingItem[];
   profileMap: Map<string, DbProfile>;
 } {
   const profileMap = new Map<string, DbProfile>();
@@ -142,8 +143,13 @@ function assembleFromSupabase(data: HydratedTripData): {
     splitWith: e.split_with.map((uid) => usernameForId(uid)),
   }));
 
+  // Packing checks: filter to current user only to prevent cross-user overwrite
   const checkMap = new Map<string, boolean>();
-  for (const c of data.packingChecks) checkMap.set(c.base_item_id, c.packed);
+  for (const c of data.packingChecks) {
+    if (!currentUserId || c.user_id === currentUserId) {
+      checkMap.set(c.base_item_id, c.packed);
+    }
+  }
 
   const packingList: PackingItem[] = data.packingBaseItems.map((p) => ({
     id: p.id,
@@ -152,7 +158,14 @@ function assembleFromSupabase(data: HydratedTripData): {
     addedBy: usernameForId(p.added_by),
   }));
 
-  return { trip, accounts, chatMessages, budgetItems, packingList, profileMap };
+  // Personal packing items (already filtered by RLS to current user)
+  const personalPackingItems: PersonalPackingItem[] = data.personalPackingItems.map((p) => ({
+    id: p.id,
+    item: p.item,
+    packed: p.packed,
+  }));
+
+  return { trip, accounts, chatMessages, budgetItems, packingList, personalPackingItems, profileMap };
 }
 
 // ── Main Component ─────────────────────────────────────────
@@ -186,6 +199,7 @@ const WellsChaosCalendar = () => {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [packingList, setPackingList] = useState<PackingItem[]>(DEFAULT_PACKING_LIST);
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(DEFAULT_BUDGET_ITEMS);
+  const [personalPackingItems, setPersonalPackingItems] = useState<PersonalPackingItem[]>([]);
 
   const getCurrentTheme = (): EventTheme => {
     if (!currentUser) return THEMES.Default;
@@ -226,12 +240,13 @@ const WellsChaosCalendar = () => {
         return;
       }
 
-      const assembled = assembleFromSupabase(data);
+      const assembled = assembleFromSupabase(data, auth.user?.id);
       setTrip(assembled.trip);
       setAccounts(assembled.accounts);
       setChatMessages(assembled.chatMessages);
       setBudgetItems(assembled.budgetItems);
       setPackingList(assembled.packingList);
+      setPersonalPackingItems(assembled.personalPackingItems);
       setProfileMap(assembled.profileMap);
       setCurrentView('app');
       setCurrentPage('home');
@@ -245,6 +260,8 @@ const WellsChaosCalendar = () => {
         messages: [...data.tripMessages, ...data.blockMessages].map((m) => ({ ...m, id: m.id })),
         budget: data.budgetExpenses.map((e) => ({ ...e, id: e.id })),
         packing: data.packingBaseItems.map((p) => ({ ...p, id: p.id })),
+        personalPacking: data.personalPackingItems.map((p) => ({ ...p, id: p.id })),
+        questionnaireResponses: data.questionnaireResponses.map((r) => ({ ...r, id: r.id })),
       }).catch(() => {});
 
       // Subscribe to realtime changes
@@ -255,19 +272,20 @@ const WellsChaosCalendar = () => {
         // but full refetch is simpler and correct
         hydrateTripData(tid).then((freshData) => {
           if (!freshData) return;
-          const fresh = assembleFromSupabase(freshData);
+          const fresh = assembleFromSupabase(freshData, auth.user?.id);
           setTrip(fresh.trip);
           setAccounts(fresh.accounts);
           setChatMessages(fresh.chatMessages);
           setBudgetItems(fresh.budgetItems);
           setPackingList(fresh.packingList);
+          setPersonalPackingItems(fresh.personalPackingItems);
           setProfileMap(fresh.profileMap);
         }).catch(() => {});
       });
     } catch {
       setCurrentView('welcome');
     }
-  }, [supabaseMode]);
+  }, [supabaseMode, auth.user]);
 
   // Cleanup realtime on unmount or logout
   useEffect(() => {
@@ -347,6 +365,7 @@ const WellsChaosCalendar = () => {
     setChatMessages([]);
     setBudgetItems(DEFAULT_BUDGET_ITEMS);
     setPackingList(DEFAULT_PACKING_LIST);
+    setPersonalPackingItems([]);
   };
 
   // ── Supabase-backed mutation callbacks ───────────────────
@@ -446,6 +465,36 @@ const WellsChaosCalendar = () => {
     });
   }, [supabaseMode, activeTripId, auth.user]);
 
+  const handleAddPersonalItem = useCallback((item: string) => {
+    if (!supabaseMode || !activeTripId || !auth.user) return;
+    const tempId = `temp-${Date.now()}`;
+    setPersonalPackingItems((prev) => [...prev, { id: tempId, item, packed: false }]);
+    createPersonalPackingItem(activeTripId, auth.user.id, item)
+      .then((created) => {
+        if (created) {
+          setPersonalPackingItems((prev) =>
+            prev.map((p) => (p.id === tempId ? { id: created.id, item: created.item, packed: created.packed } : p))
+          );
+        }
+      })
+      .catch(() => {});
+  }, [supabaseMode, activeTripId, auth.user]);
+
+  const handleTogglePersonalItem = useCallback((id: string) => {
+    setPersonalPackingItems((prev) => {
+      const item = prev.find((p) => p.id === id);
+      if (!item) return prev;
+      const newPacked = !item.packed;
+      togglePersonalPackingItem(id, newPacked).catch(() => {});
+      return prev.map((p) => (p.id === id ? { ...p, packed: newPacked } : p));
+    });
+  }, []);
+
+  const handleDeletePersonalItem = useCallback((id: string) => {
+    setPersonalPackingItems((prev) => prev.filter((p) => p.id !== id));
+    deletePersonalPackingItem(id).catch(() => {});
+  }, []);
+
   // ── Render pages ─────────────────────────────────────────
 
   const renderCurrentPage = () => {
@@ -498,8 +547,12 @@ const WellsChaosCalendar = () => {
             theme={theme}
             packingList={packingList}
             budgetItems={budgetItems}
+            personalPackingItems={personalPackingItems}
             onUpdatePackingList={handleUpdatePackingList}
             onUpdateBudgetItems={handleUpdateBudgetItems}
+            onAddPersonalItem={handleAddPersonalItem}
+            onTogglePersonalItem={handleTogglePersonalItem}
+            onDeletePersonalItem={handleDeletePersonalItem}
             onFocusModeChange={handleFocusModeChange}
           />
         );

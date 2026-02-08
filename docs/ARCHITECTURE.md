@@ -117,8 +117,12 @@ No router library. State-driven:
 
 ### Realtime Subscription Strategy
 
-- Tables with `trip_id` column: filtered with `trip_id=eq.<ACTIVE_TRIP_ID>`
-- Tables without `trip_id` (rsvps, packing_checks, time_blocks): subscribe to all rows, RLS gates
+- **Trip-filtered tables** (have `trip_id` column): filtered with `trip_id=eq.<ACTIVE_TRIP_ID>`
+  - messages, budget_expenses, packing_base_items, trip_days, rsvps, personal_packing_items, questionnaires
+- **RLS-only tables** (no direct `trip_id`): subscribe to all rows, RLS gates access
+  - time_blocks, packing_checks, questionnaire_responses
+- rsvps now has `trip_id` (migration 009) — trip-filtered for realtime
+- personal_packing_items: private to owner via RLS, trip-filtered for realtime
 - **DELETE limitation**: Supabase Realtime DELETE payloads only contain primary key columns, so column filters don't work for DELETE events — handled defensively client-side
 
 ## Key Types
@@ -128,7 +132,7 @@ Defined in `src/types/wellsChaos.ts`:
 - `Trip` (name, members, days, hotel, notes)
 - `TripDay` (date, park, blocks)
 - `TimeBlock` (type, title, times, location, rsvps, chats)
-- `PackingItem`, `BudgetItem`, `ChatMessage`, `RSVP`
+- `PackingItem`, `BudgetItem`, `ChatMessage`, `RSVP`, `PersonalPackingItem`
 
 ## Questionnaire System
 

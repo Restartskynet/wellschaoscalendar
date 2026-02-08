@@ -36,7 +36,7 @@ function profileToAccount(profile: DbProfile, memberRole?: string): Account {
   };
 }
 
-function assembleTrip(data: HydratedTripData): {
+function assembleTrip(data: HydratedTripData, currentUserId?: string): {
   trip: Trip;
   accounts: Account[];
   chatMessages: ChatMessage[];
@@ -130,10 +130,12 @@ function assembleTrip(data: HydratedTripData): {
     splitWith: e.split_with.map((uid) => usernameForId(uid)),
   }));
 
-  // Packing items — combine base items with user checks
+  // Packing items — combine base items with current user's checks only
   const checkMap = new Map<string, boolean>();
   for (const c of data.packingChecks) {
-    checkMap.set(c.base_item_id, c.packed);
+    if (!currentUserId || c.user_id === currentUserId) {
+      checkMap.set(c.base_item_id, c.packed);
+    }
   }
 
   const packingList: PackingItem[] = data.packingBaseItems.map((p) => ({

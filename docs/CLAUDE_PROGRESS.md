@@ -495,3 +495,99 @@ All include knowledge cards with informative park tips.
 - Logout cleans up subscriptions
 
 **Build**: PASS | **Tests**: 10/10 PASS
+
+---
+
+# Phase 3 — Realtime Gaps, Privacy Fixes, Trip-Scoped RSVPs
+
+---
+
+## SLICE 16 - Add trip_id to RSVPs (Schema + Backfill + RLS + Indexes)
+
+**Status**: COMPLETE
+
+**Files created**:
+- `supabase/migrations/009_rsvps_trip_id.sql`:
+  - Adds `trip_id uuid` column to rsvps (nullable, references trips)
+  - Backfills from rsvps → time_blocks → trip_days → trip_id
+  - Indexes: `idx_rsvps_trip_id`, `idx_rsvps_trip_block` (composite)
+  - RLS policies with trip_id integrity checks (INSERT/UPDATE verify block's trip matches rsvp's trip)
+  - All idempotent (DROP IF EXISTS, ADD COLUMN IF NOT EXISTS, CREATE INDEX IF NOT EXISTS)
+
+**Files changed**:
+- `src/lib/supabaseData.ts`: Added `trip_id` to `DbRsvp`, updated `upsertRsvp()`
+
+---
+
+## SLICE 17 - Realtime: Add Missing Tables + Trip-Filter RSVPs
+
+**Status**: COMPLETE
+
+**Files changed**:
+- `src/lib/realtimeSync.ts`:
+  - TRIP_FILTERED: +rsvps, +personal_packing_items, +questionnaires
+  - RLS_ONLY: +questionnaire_responses
+  - rsvps moved from RLS_ONLY → TRIP_FILTERED
+
+---
+
+## SLICE 18 - Personal Packing Items CRUD + Hydration
+
+**Status**: COMPLETE
+
+**Files changed**:
+- `src/lib/supabaseData.ts`: DbPersonalPackingItem type, fetch + CRUD, HydratedTripData + hydrateTripData updated
+
+---
+
+## SLICE 19 - Fix Packing Checks Per-User Bug + Wire Personal Items
+
+**Status**: COMPLETE
+
+**Bug fixed**: checkMap keyed by base_item_id only → other users' checks overwrote current user.
+
+**Files changed**:
+- `src/types/wellsChaos.ts`: +PersonalPackingItem type
+- `WellsChaosCalendar.tsx`: assembleFromSupabase filters checks by currentUserId, personal items state + handlers
+- `useTripData.ts`: Same per-user fix
+
+---
+
+## SLICE 20 - UI: My Personal Items + Budget Modal Testids
+
+**Status**: COMPLETE
+
+**Files changed**:
+- `MorePage.tsx`: +personalPackingItems props, "My Personal Items" section, budget modal testids, onFocusModeChange passthrough to QuestionnairesPage
+
+---
+
+## SLICE 21 - Cache: Personal Items + Questionnaire Responses
+
+**Status**: COMPLETE
+
+**Files changed**:
+- `localCache.ts`: DB_VERSION 2, +PERSONAL_PACKING +QUESTIONNAIRE_RESPONSES stores
+- `WellsChaosCalendar.tsx`: Updated cacheTripData call
+
+---
+
+## SLICE 22 - Tests + Documentation
+
+**Status**: COMPLETE
+
+**Tests added** (5 new → 15 total):
+1. Personal packing section renders with items
+2. onAddPersonalItem called on add
+3. onTogglePersonalItem called on toggle
+4. onDeletePersonalItem called on delete
+5. Combined progress of shared + personal items
+
+**Build**: PASS | **Tests**: 15/15 PASS
+
+### Manual QA Steps
+- **Mobile**: Packing tab shows "Shared List" + "My Personal Items" sections
+- **Multi-user**: Two users see different packing check states (per-user checks)
+- **Privacy**: Personal items visible only to owner (RLS enforced)
+- **Budget**: FAB → modal with sticky footer → Save always visible
+- **Realtime**: Changes to questionnaire_responses + personal_packing_items trigger refresh

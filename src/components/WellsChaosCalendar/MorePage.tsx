@@ -1,6 +1,6 @@
 import { Check, CheckCircle2, Circle, ClipboardList, DollarSign, Package, Plus, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
-import type { Account, BudgetItem, EventTheme, PackingItem, Trip } from '../../types/wellsChaos';
+import type { Account, BudgetItem, EventTheme, PackingItem, PersonalPackingItem, Trip } from '../../types/wellsChaos';
 import QuestionnairesPage from './QuestionnairesPage';
 
 type MorePageProps = {
@@ -10,8 +10,13 @@ type MorePageProps = {
   theme: EventTheme;
   packingList: PackingItem[];
   budgetItems: BudgetItem[];
+  personalPackingItems?: PersonalPackingItem[];
   onUpdatePackingList: (items: PackingItem[]) => void;
   onUpdateBudgetItems: (items: BudgetItem[]) => void;
+  onAddPersonalItem?: (item: string) => void;
+  onTogglePersonalItem?: (id: string) => void;
+  onDeletePersonalItem?: (id: string) => void;
+  onFocusModeChange?: (active: boolean) => void;
 };
 
 type TabType = 'packing' | 'budget' | 'questionnaires';
@@ -23,11 +28,17 @@ const MorePage = ({
   theme,
   packingList,
   budgetItems,
+  personalPackingItems = [],
   onUpdatePackingList,
-  onUpdateBudgetItems
+  onUpdateBudgetItems,
+  onAddPersonalItem,
+  onTogglePersonalItem,
+  onDeletePersonalItem,
+  onFocusModeChange
 }: MorePageProps) => {
   const [activeTab, setActiveTab] = useState<TabType>('packing');
   const [newPackingItem, setNewPackingItem] = useState('');
+  const [newPersonalItem, setNewPersonalItem] = useState('');
   const [showBudgetForm, setShowBudgetForm] = useState(false);
   const [editingBudgetItem, setEditingBudgetItem] = useState<BudgetItem | null>(null);
   const [budgetForm, setBudgetForm] = useState({
@@ -61,6 +72,13 @@ const MorePage = ({
 
   const handleDeletePackingItem = (id: string) => {
     onUpdatePackingList(packingList.filter((item) => item.id !== id));
+  };
+
+  // Personal item handlers
+  const handleAddPersonalItem = () => {
+    if (!newPersonalItem.trim() || !onAddPersonalItem) return;
+    onAddPersonalItem(newPersonalItem.trim());
+    setNewPersonalItem('');
   };
 
   // Budget Functions
@@ -146,6 +164,9 @@ const MorePage = ({
   const getAccount = (username: string) => accounts.find((a) => a.username === username);
 
   const packedCount = packingList.filter((item) => item.packed).length;
+  const personalPackedCount = personalPackingItems.filter((item) => item.packed).length;
+  const totalPackingItems = packingList.length + personalPackingItems.length;
+  const totalPackedItems = packedCount + personalPackedCount;
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${theme.bg} pb-24`}>
@@ -171,11 +192,11 @@ const MorePage = ({
             >
               <Package size={18} />
               Packing List
-              {packingList.length > 0 && (
+              {totalPackingItems > 0 && (
                 <span className={`text-xs px-2 py-0.5 rounded-full ${
                   activeTab === 'packing' ? 'bg-white bg-opacity-20' : 'bg-gray-200'
                 }`}>
-                  {packedCount}/{packingList.length}
+                  {totalPackedItems}/{totalPackingItems}
                 </span>
               )}
             </button>
@@ -218,25 +239,26 @@ const MorePage = ({
         {activeTab === 'packing' && (
           <div className="space-y-3 animate-fade-in">
             {/* Progress */}
-            {packingList.length > 0 && (
+            {totalPackingItems > 0 && (
               <div className="bg-white rounded-2xl shadow-lg p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-gray-700">Packing Progress</span>
                   <span className="text-sm font-bold text-purple-600">
-                    {Math.round((packedCount / packingList.length) * 100)}%
+                    {Math.round((totalPackedItems / totalPackingItems) * 100)}%
                   </span>
                 </div>
                 <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     className={`h-full bg-gradient-to-r ${theme.primary} transition-all duration-500`}
-                    style={{ width: `${(packedCount / packingList.length) * 100}%` }}
+                    style={{ width: `${(totalPackedItems / totalPackingItems) * 100}%` }}
                   />
                 </div>
               </div>
             )}
 
-            {/* Items List */}
+            {/* Shared Items List */}
             <div className="bg-white rounded-2xl shadow-lg p-4">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Shared List</div>
               {packingList.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-3">🧳</div>
@@ -298,7 +320,7 @@ const MorePage = ({
                       type="text"
                       value={newPackingItem}
                       onChange={(e) => setNewPackingItem(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleAddPackingItem()}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAddPackingItem()}
                       placeholder="Add packing item..."
                       className="flex-1 px-4 py-2 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-purple-400 transition-colors"
                     />
@@ -307,6 +329,80 @@ const MorePage = ({
                       disabled={!newPackingItem.trim()}
                       className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${
                         newPackingItem.trim()
+                          ? `bg-gradient-to-r ${theme.primary} text-white shadow-md hover:shadow-lg`
+                          : 'bg-gray-200 text-gray-400'
+                      }`}
+                    >
+                      <Plus size={18} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* My Personal Items */}
+            <div className="bg-white rounded-2xl shadow-lg p-4" data-testid="personal-packing-section">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">My Personal Items</div>
+              {personalPackingItems.length === 0 ? (
+                <div className="text-center py-4">
+                  <p className="text-gray-400 text-sm">Add items only you need to pack</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {personalPackingItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${
+                        item.packed
+                          ? 'bg-green-50 border border-green-100'
+                          : 'bg-purple-50 border border-purple-100'
+                      }`}
+                    >
+                      <button
+                        onClick={() => onTogglePersonalItem?.(item.id)}
+                        className="flex-shrink-0"
+                        data-testid={`personal-item-toggle-${item.id}`}
+                      >
+                        {item.packed ? (
+                          <CheckCircle2 size={24} className="text-green-500" />
+                        ) : (
+                          <Circle size={24} className="text-purple-300" />
+                        )}
+                      </button>
+                      <span className={`flex-1 text-sm ${item.packed ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
+                        {item.item}
+                      </span>
+                      <button
+                        onClick={() => onDeletePersonalItem?.(item.id)}
+                        className="flex-shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        data-testid={`personal-item-delete-${item.id}`}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add Personal Item */}
+              {onAddPersonalItem && (
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newPersonalItem}
+                      onChange={(e) => setNewPersonalItem(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAddPersonalItem()}
+                      placeholder="Add personal item..."
+                      data-testid="personal-item-input"
+                      className="flex-1 px-4 py-2 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-purple-400 transition-colors"
+                    />
+                    <button
+                      onClick={handleAddPersonalItem}
+                      disabled={!newPersonalItem.trim()}
+                      data-testid="personal-item-add"
+                      className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${
+                        newPersonalItem.trim()
                           ? `bg-gradient-to-r ${theme.primary} text-white shadow-md hover:shadow-lg`
                           : 'bg-gray-200 text-gray-400'
                       }`}
@@ -439,7 +535,12 @@ const MorePage = ({
         )}
         {/* Questionnaires */}
         {activeTab === 'questionnaires' && (
-          <QuestionnairesPage currentUser={currentUser} accounts={accounts} theme={theme} />
+          <QuestionnairesPage
+            currentUser={currentUser}
+            accounts={accounts}
+            theme={theme}
+            onFocusModeChange={onFocusModeChange}
+          />
         )}
       </div>
 
@@ -456,9 +557,9 @@ const MorePage = ({
 
       {/* Budget Form Modal */}
       {showBudgetForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center">
-          <div className="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl animate-slide-up max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white px-4 py-4 border-b border-gray-100 rounded-t-3xl">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center" data-testid="budget-modal">
+          <div className="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl animate-slide-up max-h-[90vh] flex flex-col">
+            <div className="flex-shrink-0 bg-white px-4 py-4 border-b border-gray-100 rounded-t-3xl">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-gray-800">
                   {editingBudgetItem ? 'Edit Expense' : 'Add Expense'}
@@ -472,7 +573,7 @@ const MorePage = ({
               </div>
             </div>
 
-            <div className="p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
@@ -569,9 +670,11 @@ const MorePage = ({
                   </div>
                 </div>
               )}
+            </div>
 
-              {/* Actions */}
-              <div className="flex gap-3 pt-2">
+            {/* Sticky Actions Footer */}
+            <div className="flex-shrink-0 p-4 border-t border-gray-100 bg-white rounded-b-3xl" data-testid="budget-modal-actions">
+              <div className="flex gap-3">
                 <button
                   onClick={resetBudgetForm}
                   className="flex-1 py-3 rounded-xl font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
@@ -581,6 +684,7 @@ const MorePage = ({
                 <button
                   onClick={handleSaveBudgetItem}
                   disabled={!budgetForm.description.trim() || !budgetForm.amount || budgetForm.splitWith.length === 0}
+                  data-testid="budget-save"
                   className={`flex-1 py-3 rounded-xl font-semibold text-white transition-all duration-200 ${
                     budgetForm.description.trim() && budgetForm.amount && budgetForm.splitWith.length > 0
                       ? `bg-gradient-to-r ${theme.primary} shadow-md hover:shadow-lg`

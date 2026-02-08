@@ -5,7 +5,7 @@ import QuestionnairesPage from './QuestionnairesPage';
 import MorePage from './MorePage';
 import { AuthProvider } from '../../providers/AuthProvider';
 import { THEMES } from '../../data/themes';
-import type { Account, Trip } from '../../types/wellsChaos';
+import type { Account, PersonalPackingItem, Trip } from '../../types/wellsChaos';
 
 const theme = THEMES.Default;
 
@@ -189,5 +189,162 @@ describe('Budget Modal Mobile UX', () => {
     const saveButton = screen.getByTestId('budget-save');
     expect(saveButton).toBeInTheDocument();
     expect(saveButton).toBeVisible();
+  });
+});
+
+describe('Personal Packing Items', () => {
+  it('renders the personal packing section with items', () => {
+    const personalItems: PersonalPackingItem[] = [
+      { id: 'p1', item: 'My headphones', packed: false },
+      { id: 'p2', item: 'My medication', packed: true },
+    ];
+
+    render(
+      <MorePage
+        trip={mockTrip}
+        currentUser={userAccount}
+        accounts={accounts}
+        theme={theme}
+        packingList={[]}
+        budgetItems={[]}
+        personalPackingItems={personalItems}
+        onUpdatePackingList={() => {}}
+        onUpdateBudgetItems={() => {}}
+        onAddPersonalItem={() => {}}
+        onTogglePersonalItem={() => {}}
+        onDeletePersonalItem={() => {}}
+      />
+    );
+
+    // Personal packing section should be visible
+    const section = screen.getByTestId('personal-packing-section');
+    expect(section).toBeInTheDocument();
+
+    // Items should be rendered
+    expect(screen.getByText('My headphones')).toBeInTheDocument();
+    expect(screen.getByText('My medication')).toBeInTheDocument();
+  });
+
+  it('calls onAddPersonalItem when adding a new personal item', async () => {
+    const user = userEvent.setup();
+    const onAddPersonalItem = vi.fn();
+
+    render(
+      <MorePage
+        trip={mockTrip}
+        currentUser={userAccount}
+        accounts={accounts}
+        theme={theme}
+        packingList={[]}
+        budgetItems={[]}
+        personalPackingItems={[]}
+        onUpdatePackingList={() => {}}
+        onUpdateBudgetItems={() => {}}
+        onAddPersonalItem={onAddPersonalItem}
+        onTogglePersonalItem={() => {}}
+        onDeletePersonalItem={() => {}}
+      />
+    );
+
+    const input = screen.getByTestId('personal-item-input');
+    await user.type(input, 'My sunglasses');
+
+    const addButton = screen.getByTestId('personal-item-add');
+    await user.click(addButton);
+
+    expect(onAddPersonalItem).toHaveBeenCalledWith('My sunglasses');
+  });
+
+  it('calls onTogglePersonalItem when toggling a personal item', async () => {
+    const user = userEvent.setup();
+    const onTogglePersonalItem = vi.fn();
+
+    const personalItems: PersonalPackingItem[] = [
+      { id: 'p1', item: 'My headphones', packed: false },
+    ];
+
+    render(
+      <MorePage
+        trip={mockTrip}
+        currentUser={userAccount}
+        accounts={accounts}
+        theme={theme}
+        packingList={[]}
+        budgetItems={[]}
+        personalPackingItems={personalItems}
+        onUpdatePackingList={() => {}}
+        onUpdateBudgetItems={() => {}}
+        onAddPersonalItem={() => {}}
+        onTogglePersonalItem={onTogglePersonalItem}
+        onDeletePersonalItem={() => {}}
+      />
+    );
+
+    const toggleButton = screen.getByTestId('personal-item-toggle-p1');
+    await user.click(toggleButton);
+
+    expect(onTogglePersonalItem).toHaveBeenCalledWith('p1');
+  });
+
+  it('calls onDeletePersonalItem when deleting a personal item', async () => {
+    const user = userEvent.setup();
+    const onDeletePersonalItem = vi.fn();
+
+    const personalItems: PersonalPackingItem[] = [
+      { id: 'p1', item: 'My headphones', packed: false },
+    ];
+
+    render(
+      <MorePage
+        trip={mockTrip}
+        currentUser={userAccount}
+        accounts={accounts}
+        theme={theme}
+        packingList={[]}
+        budgetItems={[]}
+        personalPackingItems={personalItems}
+        onUpdatePackingList={() => {}}
+        onUpdateBudgetItems={() => {}}
+        onAddPersonalItem={() => {}}
+        onTogglePersonalItem={() => {}}
+        onDeletePersonalItem={onDeletePersonalItem}
+      />
+    );
+
+    const deleteButton = screen.getByTestId('personal-item-delete-p1');
+    await user.click(deleteButton);
+
+    expect(onDeletePersonalItem).toHaveBeenCalledWith('p1');
+  });
+
+  it('shows combined progress of shared + personal items', () => {
+    const sharedItems = [
+      { id: 's1', item: 'Sunscreen', packed: true, addedBy: 'ben' },
+      { id: 's2', item: 'Snacks', packed: false, addedBy: 'ben' },
+    ];
+    const personalItems: PersonalPackingItem[] = [
+      { id: 'p1', item: 'My headphones', packed: true },
+    ];
+
+    render(
+      <MorePage
+        trip={mockTrip}
+        currentUser={userAccount}
+        accounts={accounts}
+        theme={theme}
+        packingList={sharedItems}
+        budgetItems={[]}
+        personalPackingItems={personalItems}
+        onUpdatePackingList={() => {}}
+        onUpdateBudgetItems={() => {}}
+        onAddPersonalItem={() => {}}
+        onTogglePersonalItem={() => {}}
+        onDeletePersonalItem={() => {}}
+      />
+    );
+
+    // Progress should show 2/3 (1 shared packed + 1 personal packed out of 2 shared + 1 personal)
+    expect(screen.getByText('67%')).toBeInTheDocument();
+    expect(screen.getByText('2/3')).toBeInTheDocument();
   });
 });

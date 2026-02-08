@@ -60,6 +60,7 @@ export type DbRsvp = {
   id: string;
   block_id: string;
   user_id: string;
+  trip_id: string | null;
   status: 'going' | 'not-going';
   quip: string | null;
 };
@@ -105,6 +106,14 @@ export type DbQuestionnaireResponse = {
   answers: Record<string, unknown>;
   completed: boolean;
   submitted_at: string | null;
+};
+
+export type DbPersonalPackingItem = {
+  id: string;
+  trip_id: string;
+  user_id: string;
+  item: string;
+  packed: boolean;
 };
 
 // ── Guard ──────────────────────────────────────────────────
@@ -258,6 +267,16 @@ export async function fetchQuestionnaireResponses(tripId: string): Promise<DbQue
   return (data || []) as DbQuestionnaireResponse[];
 }
 
+/** Get personal packing items for a trip (RLS restricts to current user's items) */
+export async function fetchPersonalPackingItems(tripId: string): Promise<DbPersonalPackingItem[]> {
+  const sb = requireSupabase();
+  const { data } = await sb
+    .from('personal_packing_items')
+    .select('*')
+    .eq('trip_id', tripId);
+  return (data || []) as DbPersonalPackingItem[];
+}
+
 // ── Mutations ──────────────────────────────────────────────
 
 /** Create a new trip */
@@ -322,13 +341,13 @@ export async function deleteTimeBlock(id: string): Promise<boolean> {
   return !error;
 }
 
-/** Upsert an RSVP */
-export async function upsertRsvp(blockId: string, userId: string, status: 'going' | 'not-going', quip?: string): Promise<DbRsvp | null> {
+/** Upsert an RSVP (trip_id required for RLS integrity check) */
+export async function upsertRsvp(blockId: string, userId: string, status: 'going' | 'not-going', quip?: string, tripId?: string): Promise<DbRsvp | null> {
   const sb = requireSupabase();
   const { data } = await sb
     .from('rsvps')
     .upsert(
-      { block_id: blockId, user_id: userId, status, quip: quip || null },
+      { block_id: blockId, user_id: userId, status, quip: quip || null, ...(tripId ? { trip_id: tripId } : {}) },
       { onConflict: 'block_id,user_id' }
     )
     .select()
@@ -439,6 +458,36 @@ export async function saveQuestionnaireResponse(
   return data as DbQuestionnaireResponse | null;
 }
 
+/** Create a personal packing item */
+export async function createPersonalPackingItem(tripId: string, userId: string, item: string): Promise<DbPersonalPackingItem | null> {
+  const sb = requireSupabase();
+  const { data } = await sb
+    .from('personal_packing_items')
+    .insert({ trip_id: tripId, user_id: userId, item })
+    .select()
+    .single();
+  return data as DbPersonalPackingItem | null;
+}
+
+/** Toggle a personal packing item's packed state */
+export async function togglePersonalPackingItem(id: string, packed: boolean): Promise<DbPersonalPackingItem | null> {
+  const sb = requireSupabase();
+  const { data } = await sb
+    .from('personal_packing_items')
+    .update({ packed })
+    .eq('id', id)
+    .select()
+    .single();
+  return data as DbPersonalPackingItem | null;
+}
+
+/** Delete a personal packing item */
+export async function deletePersonalPackingItem(id: string): Promise<boolean> {
+  const sb = requireSupabase();
+  const { error } = await sb.from('personal_packing_items').delete().eq('id', id);
+  return !error;
+}
+
 // ── Full trip hydration ────────────────────────────────────
 
 export type HydratedTripData = {
@@ -453,6 +502,7 @@ export type HydratedTripData = {
   packingBaseItems: DbPackingBaseItem[];
   packingChecks: DbPackingCheck[];
   questionnaireResponses: DbQuestionnaireResponse[];
+  personalPackingItems: DbPersonalPackingItem[];
 };
 
 /** Fetch all trip data in one batch */
@@ -470,13 +520,14 @@ export async function hydrateTripData(tripId: string): Promise<HydratedTripData 
     if (!tripRes.data) return null;
 
     const dayIds = days.map((d) => d.id);
-    const [blocks, tripMessages, budgetExpenses, packingBaseItems, questionnaireResponses] =
+    const [blocks, tripMessages, budgetExpenses, packingBaseItems, questionnaireResponses, personalPackingItems] =
       await Promise.all([
         fetchTimeBlocks(dayIds),
         fetchTripMessages(tripId),
         fetchBudgetExpenses(tripId),
         fetchPackingBaseItems(tripId),
         fetchQuestionnaireResponses(tripId),
+        fetchPersonalPackingItems(tripId),
       ]);
 
     const blockIds = blocks.map((b) => b.id);
@@ -500,6 +551,7 @@ export async function hydrateTripData(tripId: string): Promise<HydratedTripData 
       packingBaseItems,
       packingChecks,
       questionnaireResponses,
+      personalPackingItems,
     };
   } catch {
     return null;
